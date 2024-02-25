@@ -46,7 +46,7 @@ Check whether bridge creation is successful or not.
 **sudo brctl show**
 
 **bridge name      bridge id               STP enabled     interfaces**
-   br              8000.72a4951379e5         no                      
+   **br              8000.72a4951379e5         no**      
 
 ‘Up’ the bridge.
 

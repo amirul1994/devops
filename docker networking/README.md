@@ -100,7 +100,7 @@ At this stage,  I shall test connectivity between the ‘red’ and ‘green’ 
 
 Inside the ‘red’ network namespace.
 
-root@amirul:/home/amirul# ping 10.0.0.3
+**root@amirul:/home/amirul# ping 10.0.0.3**
 
 PING 10.0.0.3 (10.0.0.3) 56(84) bytes of data.
 
@@ -116,7 +116,7 @@ PING 10.0.0.3 (10.0.0.3) 56(84) bytes of data.
 Inside the ‘green’ network namespace.
 
 
-amirul@amirul:~$ sudo ip netns exec green bash
+**amirul@amirul:~$ sudo ip netns exec green bash**
 
 root@amirul:/home/amirul# ping 10.0.0.2
 
@@ -143,7 +143,7 @@ At the present stage, I will ping 8.8.8.8 from both ‘red’ & ‘green’ name
 
 ‘red’ network namespace
 
-root@amirul:/home/amirul# ping 8.8.8.8
+**root@amirul:/home/amirul# ping 8.8.8.8**
 
 PING 8.8.8.8 (8.8.8.8) 56(84) bytes of data.
 
@@ -152,7 +152,7 @@ PING 8.8.8.8 (8.8.8.8) 56(84) bytes of data.
 10 packets transmitted, 0 received, 100% packet loss, time 9194ms
 
 
-‘green’ network namespace
+**‘green’ network namespace**
 
 root@amirul:/home/amirul# ping 8.8.8.8
 
@@ -175,7 +175,7 @@ ens33: name of the ‘root’ namespace’s network interface
 -p: protocol
 
 
-amirul@amirul:~$ sudo tcpdump -i ens33 -p icmp
+**amirul@amirul:~$ sudo tcpdump -i ens33 -p icmp**
 
 [sudo] password for amirul:
 
@@ -223,7 +223,7 @@ MASQUERADE: it will alter the packets' ip address to the network interface’s i
 Now again ping from the ‘red’, and ‘green’ network namespaces and listen on the ens33 interface.
 
 
-amirul@amirul:~$ sudo ip netns exec red ping 8.8.8.8
+**amirul@amirul:~$ sudo ip netns exec red ping 8.8.8.8**
 
 PING 8.8.8.8 (8.8.8.8) 56(84) bytes of data.
 
@@ -244,7 +244,7 @@ PING 8.8.8.8 (8.8.8.8) 56(84) bytes of data.
 64 bytes from 8.8.8.8: icmp_seq=8 ttl=112 time=35.2 ms
 
 
-amirul@amirul:~$ sudo ip netns exec green ping 8.8.8.8
+**amirul@amirul:~$ sudo ip netns exec green ping 8.8.8.8**
 
 PING 8.8.8.8 (8.8.8.8) 56(84) bytes of data.
 

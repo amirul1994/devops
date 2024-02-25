@@ -41,13 +41,6 @@ Now, I shall create a bridge. The advantage of the bridge is, it will let multip
 **sudo ip link add dev br type bridge**
 
 
-Check whether bridge creation is successful or not.
-
-**sudo brctl show**
-
-**bridge name      bridge id               STP enabled     interfaces**
-   **br              8000.72a4951379e5         no**      
-
 ‘Up’ the bridge.
 
 **sudo ip link set dev br up**
@@ -56,7 +49,7 @@ To connect those network namespaces, first I have to create two virtual ethernet
 
 **sudo ip link add dev red-eth type veth peer name br-red**
 
-sudo ip link add dev green-eth type veth peer name br-green**
+**sudo ip link add dev green-eth type veth peer name br-green**
 
 After that, connect the virtual ethernet cables on one side to the network namespaces.
 

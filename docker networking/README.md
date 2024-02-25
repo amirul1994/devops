@@ -1,4 +1,5 @@
 ![11](https://github.com/Amirul1994/devops/assets/119165587/9005b3ab-727a-4172-8076-013d8de2f359)
+
 First, a brief introduction to Linux namespace-
 
 Linux namespace is a feature of the Linux kernel. It provides isolation for the system resources for a number of processes. That gives those processes to have a separate view of these resources. Docker calls Linux namespace APIs to create a docker container.Each namespace has a separate instance of a particular resource. Linux has seven default namespaces and the Network namespace is one of them. The network namespace decides a process’s ability to see the network devices. It has its own independent set of networking. The network namespace can have its own virtual network devices e.g. ethernet cables, switches, and ip addresses, routing tables, firewall rules, etc. 

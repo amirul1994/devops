@@ -22,6 +22,13 @@ tcpdump – a tool for packet analysis
 
 **sudo apt install iproute2 net-tools iputils-ping tcpdump -y**
 
+Enable ip forwarding
+
+**sysctl -w net.ipv4.ip_forward=1**
+
+[If to make permanent changes that survive a reboot, you need to edit the /etc/sysctl.conf file or files in the /etc/sysctl.d/ directory. You can add the line net.ipv4.ip_forward = 1 to these files to enable IP forwarding permanently. After adding the line, you can apply the changes immediately by running sudo sysctl -p. This command loads in sysctl settings from the /etc/sysctl.conf file or /etc/sysctl.d/ directory.]
+
+
 In Linux, it is possible to create a custom namespace. I shall create two network namespaces and name them ‘red’ and ‘green’.
 
 **sudo ip netns add red**

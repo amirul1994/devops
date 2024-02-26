@@ -1,5 +1,6 @@
 sudo apt update 
 sudo apt install iproute2 net-tools iputils-ping tcpdump -y
+sudo sysctl net.ipv4.ip_forward=1
 sudo ip netns add red
 sudo ip netns add green
 sudo ip link add dev br type bridge
@@ -13,8 +14,8 @@ sudo ip link set br-green master br
 sudo ip addr add 10.0.0.1/24 dev br
 sudo ip link set br-red up
 sudo ip link set br-green up
-sudo ip netns exec red bash ip addr add 10.0.0.2/24 dev red-eth
-sudo ip netns exec red bash ip link set red-eth up
+sudo ip netns exec red ip addr add 10.0.0.2/24 dev red-eth
+sudo ip netns exec red ip link set red-eth up
 sudo ip netns exec green ip link set green-eth up
 sudo ip netns exec green ip addr add 10.0.0.3/24 dev green-eth
 sudo ip netns exec red ip route add default via 10.0.0.1

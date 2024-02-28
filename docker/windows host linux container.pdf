@@ -1,0 +1,10 @@
+When you’re running Docker on a Windows system, it actually uses a Linux virtual machine (VM) to run the Docker engine. This is because Docker was originally designed for Linux, and it uses several Linux kernel features for containerization.
+
+When you run a Docker container of Ubuntu on a Windows host, here’s what happens:
+
+Docker uses a lightweight virtual machine (VM) to host the Docker engine and the Linux kernel. This VM runs on the Windows host operating system.
+When you pull an Ubuntu image and run it as a Docker container, the container runs on the Linux kernel within the VM.
+The Ubuntu container shares the Linux kernel of the VM, not the Windows kernel of the host OS.
+So, in this setup, the Ubuntu Docker container and the Windows host OS are not sharing the same kernel. The Ubuntu container is sharing the kernel with the Linux VM that Docker is using to run the Docker engine.
+
+This is why you can run Linux containers on Windows using Docker, even though Linux and Windows have different kernels. The key is the use of a lightweight VM to provide a Linux kernel for Docker to use. This setup allows you to develop and test Linux applications on your Windows machine using Docker.

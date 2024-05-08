@@ -1,0 +1,1 @@
+from .management.commands import run_migrations_safely

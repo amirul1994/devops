@@ -1,0 +1,80 @@
+version: '3'
+
+networks:
+  docker-project-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+services:
+  db:
+    container_name: "db-server"
+    volumes:
+      - ./docker_project_volume:/var/lib/mysql
+    build: 
+      context: ./db/.
+      dockerfile: Dockerfile
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_ALLOW_EMPTY_PASSWORD=no
+      - MYSQL_AUTH_PLUGIN=mysql_native_password
+      - MYSQL_HOST=db-server
+    ports:
+      - "3306:3306"
+    networks:
+      docker-project-network:
+        ipv4_address: 172.20.0.10
+    
+    
+  backend-service-1:
+    container_name: "backend-server-1"
+    build: 
+      context: ./backend1/. 
+      dockerfile: Dockerfile 
+    ports:
+      - "8000:8000"
+    networks:
+      docker-project-network:
+        ipv4_address: 172.20.0.11
+    depends_on:
+      - db
+  
+  backend-service-2:
+    container_name: "backend-server-2"
+    build:
+      context: ./backend2/.
+      dockerfile: Dockerfile
+    ports: 
+      - "9000:9000"
+    networks:
+      docker-project-network:
+        ipv4_address: 172.20.0.12
+    depends_on:
+      - db
+  
+  nginx:
+    container_name: "load-balancer-server"
+    build:
+      context: ./nginx/conf/.
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    networks:
+      docker-project-network:
+        ipv4_address: 172.20.0.13
+    depends_on:
+      - backend-service-1
+      - backend-service-2
+      
+  frontend-service: 
+    container_name: "frontend-server"
+    build:
+      context: ./frontend/.
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    networks:
+      docker-project-network:
+        ipv4_address: 172.20.0.14

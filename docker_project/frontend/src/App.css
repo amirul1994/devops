@@ -1,0 +1,25 @@
+/* App.css */
+.App {
+  text-align: center;
+}
+
+.login-form,
+.signup-form,
+.user-details,
+.search-section {
+  display: flex;
+  flex-direction: column;
+  margin: 20px;
+  align-items: center;
+}
+
+input {
+  margin: 10px 0;
+  padding: 10px;
+  width: 200px;
+}
+
+button {
+  padding: 10px 20px;
+  cursor: pointer;
+}

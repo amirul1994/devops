@@ -1,6 +1,8 @@
 Communication between two VPCs in AWS can happen in several ways. In this article, I will demonstrate two methods to ensure communication between two different VPCs.
-a.      Transit Gateway
-b.     VPC Peering
+
+a. Transit Gateway
+
+b. VPC Peering
 
 Transit Gateway
 AWS Transit Gateway is a service used to connect multiple AWS VPCs or an AWS VPC and an on-premises network. It provides a single gateway for this connectivity. It allows you to create a global network by connecting VPCs and edge networks across multiple AWS regions.

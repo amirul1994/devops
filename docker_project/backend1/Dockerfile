@@ -18,11 +18,11 @@ RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys B7B3B788A8D3785C
 RUN apt-get update && apt-get install -y mysql-client netcat-openbsd
 
 # Install wget
-RUN apt-get update && apt-get install -y wget
+#RUN apt-get update && apt-get install -y wget
 
 # Install dockerize
 RUN wget -q -O /usr/local/bin/dockerize https://github.com/jwilder/dockerize/releases/download/v0.7.0/dockerize-linux-amd64-v0.7.0.tar.gz \
-    && tar -C /usr/local/bin -xzvf /usr/local/bin/dockerize
+    && tar -C /usr/local/bin -xzvf /usr/local/bin/dockerize/dockerize-linux-amd64-v0.7.0.tar.gz
 
 COPY ./docker_backend/requirements.txt .
 

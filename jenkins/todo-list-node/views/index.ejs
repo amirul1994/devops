@@ -1,0 +1,40 @@
+<!-- views/index.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple To-Do List</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+  <div class="container mt-5">
+    <h1 class="text-center">To-Do List</h1>
+    <form action="/add" method="POST" class="mb-4">
+      <div class="input-group">
+        <input type="text" name="newItem" class="form-control" placeholder="Add a new to-do item" required>
+        <div class="input-group-append">
+          <button class="btn btn-primary" type="submit">Add</button>
+        </div>
+      </div>
+    </form>
+
+    <ul class="list-group">
+      <% if (todoItems.length === 0) { %>
+        <li class="list-group-item text-center">No items in the list!</li>
+      <% } else { %>
+        <% todoItems.forEach((item, index) => { %>
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <span><%= item %></span>
+            <form action="/delete" method="POST" style="display: inline;">
+              <input type="hidden" name="index" value="<%= index %>">
+              <button class="btn btn-danger btn-sm" type="submit">Delete</button>
+            </form>
+          </li>
+        <% }); %>
+      <% } %>
+    </ul>
+  </div>
+</body>
+</html>

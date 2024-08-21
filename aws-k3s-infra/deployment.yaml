@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server1-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: server1
+  template:
+    metadata:
+      labels:
+        app: server1
+    spec:
+      containers:
+      - name: server1
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+      #nodeSelector:
+      # role: worker-node
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: server1-service
+spec:
+  selector:
+    app: server1
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+    nodePort: 30001
+  type: NodePort

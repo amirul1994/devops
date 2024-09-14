@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apache-tol-dep
+  labels:
+    type: apache-srv
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      type: apache-srv
+  template:
+    metadata:
+      labels:
+        type: apache-srv
+    spec:
+      tolerations:
+      - key: "app2"
+        operator: "Equal"
+        value: "green"
+        effect: "NoSchedule"
+      containers:
+      - name: apache
+        image: httpd
+        ports:
+        - containerPort: 80

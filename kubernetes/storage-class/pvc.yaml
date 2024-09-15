@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: my-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce  # Only one node can mount this volume at a time
+  resources:
+    requests:
+      storage: 10Gi  # Size of the requested volume
+  storageClassName: standard-storage-class 

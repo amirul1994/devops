@@ -1,0 +1,11 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: standard-storage-class
+provisioner: kubernetes.io/aws-ebs  # Or your specific provisioner
+parameters:
+  type: gp2  # Amazon EBS volume type (General Purpose SSD)
+  fsType: ext4  # Filesystem type
+reclaimPolicy: Delete  # Defines if the volume should be deleted after PVC is deleted
+volumeBindingMode: Immediate
+

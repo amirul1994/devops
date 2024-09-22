@@ -2,10 +2,14 @@ In Kubernetes, RBAC is used to manage permissions and control access to the Kube
 
 Roles and ClusterRoles:
 
+The following roles are used:
+
 A Role is a set of permissions within a specific namespace.
 A ClusterRole is a set of permissions that are cluster-wide.
 
 RoleBindings and ClusterRoleBindings:
+
+The following rolebindings are used:
 
 A RoleBinding grants the permissions defined in a Role to a user or a group within a specific namespace.
 A ClusterRoleBinding grants the permissions defined in a ClusterRole to a user or a group cluster-wide.

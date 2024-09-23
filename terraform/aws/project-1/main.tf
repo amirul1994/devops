@@ -1,7 +1,7 @@
 provider "aws" {
   region = "us-east-1"
-  access_key = "AKIA2UC267UUOVZ3FFNX"
-  secret_key = "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"
+  access_key = "use the access key or use secret manager"
+     secret_key = "use secret access key or secret manager"
 } 
 
 # resource "<provider>_<resource_type>" "name" {

@@ -1,8 +1,9 @@
-provider "aws" {
-    region = "us-east-1"
-    access_key = "AKIAZI2LCYQICQ6VA7ME"
-    secret_key = "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"
-}
+
+ provider "aws" {
+     region = "us-east-1"
+     access_key = "use the access key or use secret manager"
+     secret_key = "use secret access key or secret manager"
+ }
 
 resource "tls_private_key" "access-key" {
     algorithm = "RSA"

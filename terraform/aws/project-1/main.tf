@@ -1,7 +1,7 @@
 provider "aws" {
   region = "us-east-1"
-  access_key = "use the access key or use secret manager"
-     secret_key = "use secret access key or secret manager"
+  access_key = var.AWS_ACCESS_KEY_ID
+  secret_key = var.AWS_SECRET_ACCESS_KEY
 } 
 
 # resource "<provider>_<resource_type>" "name" {

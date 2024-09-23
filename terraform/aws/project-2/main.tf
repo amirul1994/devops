@@ -15,11 +15,12 @@ resource "aws_key_pair" "access-key" {
     public_key = tls_private_key.access-key.public_key_openssh
 }
 
-resource "local_file" "public_key" {
-    content = tls_private_key.access-key.public_key_openssh
-    filename = "${path.module}/access-key.pub"
-    file_permission = "0644"
-} 
+resource "local_file" "private_key" {
+  content         = tls_private_key.access-key.private_key_pem
+  filename        = "${path.module}/access-key.pem"
+  file_permission = "0600"
+}
+ 
 
 resource "aws_vpc" "prod-vpc" {
     cidr_block = "10.0.0.0/16"

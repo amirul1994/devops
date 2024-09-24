@@ -21,11 +21,26 @@ resource "local_file" "private_key" {
   file_permission = "0600"
 }
  
+variable "subnet_prefix" {
+     description = "cidr block for the subnet"
+     # default = "10.0.200.0/24"
+     # type = String
+}
 
 resource "aws_vpc" "prod-vpc" {
     cidr_block = "10.0.0.0/16"
     tags = {
         Name = "production"
+    }
+}
+
+resource "aws_subnet" "subnet-1" {
+    vpc_id = aws_vpc.prod-vpc.id
+    cidr_block = var.subnet_prefix
+    availability_zone = "us-east-1a"
+
+    tags = {
+        Name = "prod-subnet"
     }
 }
 
@@ -48,16 +63,6 @@ resource "aws_route_table" "prod-route-table" {
         Name = "prod-route-table"
     }
 } 
-
-resource "aws_subnet" "subnet-1" {
-    vpc_id = aws_vpc.prod-vpc.id
-    cidr_block = "10.0.1.0/24"
-    availability_zone = "us-east-1a"
-
-    tags = {
-        Name = "prod-subnet"
-    }
-}
 
 resource "aws_route_table_association" "a" {
     subnet_id = aws_subnet.subnet-1.id
@@ -107,7 +112,7 @@ resource "aws_security_group" "allow_web_ssh" {
 
 resource "aws_network_interface" "web-server-nic" {
     subnet_id = aws_subnet.subnet-1.id
-    private_ips = ["10.0.1.50"]
+    # private_ips = ["10.0.200.50"]
     security_groups = [aws_security_group.allow_web_ssh.id]
 } 
 
@@ -115,9 +120,13 @@ resource "aws_eip" "one" {
     #vpc = true
     domain = "vpc" 
     network_interface = aws_network_interface.web-server-nic.id
-    associate_with_private_ip = "10.0.1.50"
+    # associate_with_private_ip = "10.0.200.50"
     depends_on = [aws_internet_gateway.gw]
 } 
+
+output "server_public_ip" {
+    value = aws_eip.one.public_ip 
+}
 
 resource "aws_instance" "web-server-instance" {
   ami           = "ami-0e86e20dae9224db8"
@@ -142,4 +151,12 @@ resource "aws_instance" "web-server-instance" {
     tags = {
         Name = "web-server"
     }
+} 
+
+ output "server_private_ip" {
+    value = aws_instance.web-server-instance.private_ip 
+} 
+
+output "server_id" {
+    value = aws_instance.web-server-instance.id
 }

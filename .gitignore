@@ -1,0 +1,14 @@
+# Ignore .terraform directories in any subdirectory
+**/.terraform/
+
+# Ignore .pem files in any subdirectory
+**/*.pem
+
+# Ignore other common files and directories
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.log
+*.backup
+*.swp
+.terraform.lock.hcl

@@ -2,7 +2,7 @@
 **/.terraform/
 
 # Ignore .pem files in any subdirectory
-**/*.pem
+terraform/aws/project-2/access-key.pem
 
 # Ignore other common files and directories
 *.tfstate

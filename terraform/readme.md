@@ -9,3 +9,16 @@ terraform destroy - destroy the infra
 .terraform folder - created when any plugin is initialized. If this folder get deleted, again use 'terraform init' command.
 
 terraform.tfstate - keep the track of the state of the infrastructure. If any change has been made, compare it with this file and then apply the changes. After applying the changes, modify the file according to the changes. If this file is deleted, it will break terraform leading to a mismatch state.
+
+terraform state list - The terraform state list command lists all the resources that Terraform is managing in the current state.
+
+terraform state show - The terraform state show command is used to display detailed information about a specific resource in the Terraform state.
+
+terraform state show <resource_address>
+terraform state show aws_internet_gateway.gw
+
+terraform destroy -target <resource_address>
+terraform destroy -target aws_instance.web-server-instance 
+
+terraform apply -target <resource_adress>
+terraform apply -target aws_instance.web-server-instace

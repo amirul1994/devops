@@ -38,6 +38,7 @@ Enable access logging for both the S3 buckets and the CloudFront distributions, 
 Set up CloudWatch metrics for monitoring traffic and access patterns.
 
 project-4/
+
 ├── main.tf
 
 ├── variables.tf

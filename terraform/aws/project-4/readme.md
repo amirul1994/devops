@@ -39,31 +39,42 @@ Set up CloudWatch metrics for monitoring traffic and access patterns.
 
 project-4/
 ├── main.tf
+
 ├── variables.tf
+
 ├── outputs.tf
+
 ├── terraform.tfvars
+
 ├── modules/
-│   ├── s3/
-│   │   ├── main.tf
+│   
+    ├── s3/
+|   |   ├── main.tf
 │   │   ├── variables.tf
 │   │   ├── outputs.tf
+
 │   ├── cloudfront/
 │   │   ├── main.tf
 │   │   ├── variables.tf
 │   │   ├── outputs.tf
+
 │   ├── iam/
 │   │   ├── main.tf
 │   │   ├── variables.tf
 │   │   ├── outputs.tf
+
 ├── environments/
+
 │   ├── dev/
 │   │   ├── main.tf
 │   │   ├── variables.tf
 │   │   ├── terraform.tfvars
+
 │   ├── staging/
 │   │   ├── main.tf
 │   │   ├── variables.tf
 │   │   ├── terraform.tfvars
+
 │   ├── prod/
 │   │   ├── main.tf
 │   │   ├── variables.tf

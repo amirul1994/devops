@@ -6,36 +6,83 @@ Create a multi-environment (e.g., development, staging, production) static websi
 
 Project Components:
 
-S3 Buckets for Static Website Hosting:
+Here is the requested format:
 
-Create separate S3 buckets for different environments (e.g., my-website-dev, my-website-staging, and my-website-prod).
+---
 
-Enable static website hosting for each bucket.
-Set up appropriate bucket policies to make the website publicly accessible (or private if needed).
+**1) Create S3 Buckets for Static Website Hosting**
 
-Versioning and Lifecycle Policies:
+   **a) Create S3 Buckets:**
+   
+   i) Create separate S3 buckets for each environment (e.g., `my-website-dev`, `my-website-staging`, `my-website-prod`).
 
-Enable versioning for all S3 buckets to ensure old versions of files can be retained.
-Set up a lifecycle policy to automatically move older versions of files to a different storage class (e.g., Glacier) or delete them after a certain period.
+   **b) Enable Static Website Hosting for Each Bucket:**
 
-CloudFront Distribution:
+   i) Enable static website hosting in the bucket properties.  
+   
+   ii) Set the index and error documents (e.g., `index.html`, `error.html`).
 
-Create CloudFront distributions for each environment to serve the website content from S3, ensuring low-latency access globally.
+   **c) Configure Bucket Policies:**
 
-Configure custom domain names (if needed) using Route 53.
+   i) Set up appropriate bucket policies to make the website publicly accessible if required.  
+   
+   ii) For private access, restrict the bucket policy as necessary.
 
-Set up SSL certificates with ACM for secure HTTPS traffic.
+---
 
-IAM Policies and Roles:
+**2) Versioning and Lifecycle Policies**
 
-Create IAM roles and policies to manage access to the S3 buckets.
-Ensure that only specific users or services can upload files to the buckets, while making the content publicly accessible via CloudFront.
+   **a) Enable Versioning for All S3 Buckets:**
 
-Logging and Monitoring:
+   i) Enable versioning on each S3 bucket to retain old versions of files.
 
-Enable access logging for both the S3 buckets and the CloudFront distributions, storing logs in a separate S3 bucket.
+   **b) Set Up Lifecycle Policies:**
 
-Set up CloudWatch metrics for monitoring traffic and access patterns.
+   i) Configure a lifecycle rule to move older versions of files to a different storage class (e.g., Glacier).  
+   
+   ii) Optionally, configure a rule to delete old file versions after a certain period.
+
+---
+
+**3) CloudFront Distribution**
+
+   **a) Create CloudFront Distributions:**
+
+   i) Create a CloudFront distribution for each environment to serve website content from S3.
+
+   **b) Configure Custom Domain Names:**
+
+   i) Set up custom domains using Route 53 (if needed).
+
+   **c) Set Up SSL Certificates:**
+
+   i) Use AWS Certificate Manager (ACM) to configure SSL certificates for HTTPS traffic.
+
+---
+
+**4) IAM Policies and Roles**
+
+   **a) Create IAM Roles and Policies:**
+
+   i) Define IAM roles and policies to manage access to S3 buckets.  
+   
+   ii) Restrict file upload permissions to specific users or services while ensuring content is publicly accessible via CloudFront.
+
+---
+
+**5) Logging and Monitoring**
+
+   **a) Enable Access Logging:**
+
+   i) Set up access logging for both S3 buckets and CloudFront distributions.  
+   
+   ii) Store the logs in a separate S3 bucket.
+
+   **b) Set Up CloudWatch Metrics:**
+
+   i) Monitor traffic and access patterns using CloudWatch metrics.
+
+---
 
 project-4/
 
@@ -80,3 +127,15 @@ project-4/
 │   │   ├── main.tf
 │   │   ├── variables.tf
 │   │   ├── terraform.tfvars
+
+
+ACM Certificates and CloudFront
+Global Certificates: ACM certificates issued in the us-east-1 region (N. Virginia) are considered global certificates. These certificates can be used with AWS services that require global certificates, such as Amazon CloudFront.
+
+Regional Certificates: ACM certificates issued in other regions are regional certificates and can only be used with services in that specific region. For example, a certificate issued in us-west-2 can be used with services like Elastic Load Balancing (ELB) or API Gateway in the us-west-2 region.
+
+Why us-east-1 for ACM Certificates?
+CloudFront Requirement: If you are using Amazon CloudFront for content delivery, you must use an ACM certificate issued in the us-east-1 region. CloudFront requires global certificates, and only certificates issued in us-east-1 meet this requirement.
+
+
+The origin_access_identity must be a valid OAI ID that you have created in your AWS account.

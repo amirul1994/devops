@@ -43,8 +43,10 @@ resource "aws_s3_bucket_website_configuration" "website_hosting_dev" {
 
     error_document {
         key = "error.html"
-    }
+    } 
+
 } 
+
 
 output "bucket_website_url_dev" {
     value = aws_s3_bucket_website_configuration.website_hosting_dev.website_endpoint

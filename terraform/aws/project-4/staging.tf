@@ -1,6 +1,6 @@
 resource "aws_s3_bucket" "website_staging" {
     bucket = "my-website-staging-1000"
-    
+
     tags = {
         Name = "my-website-staging"
         Environment = "staging"
@@ -44,6 +44,7 @@ resource "aws_s3_bucket_website_configuration" "website_hosting_staging" {
     error_document {
         key = "error.html"
     }
+
 } 
 
 output "bucket_website_url_staging" {

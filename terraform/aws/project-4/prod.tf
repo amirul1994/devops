@@ -60,12 +60,17 @@ resource "aws_s3_bucket_policy" "website_prod_policy" {
         Version = "2012-10-17",
         Statement = [
             {
-                Sid = "PublicReadGetObject",
+                Sid = "PublicAccess",
                 Effect = "Allow",
                 Principal = "*",
-                Action = "s3:GetObject",
+                Action = [
+                          "s3:GetObject",
+                          "s3:PutObject",
+                          "s3:PutObjectAcl",
+                          "s3:DeleteObject"
+                         ],
                 Resource = "${aws_s3_bucket.website_prod.arn}/*"
-            }
+            }, 
         ]
     }) 
 

@@ -47,6 +47,32 @@ resource "aws_s3_bucket_website_configuration" "website_hosting_staging" {
 
 } 
 
+
+resource "aws_s3_bucket_policy" "website_staging_policy" {
+    bucket = aws_s3_bucket.website_staging.id 
+
+    policy = jsonencode ({
+        Version = "2012-10-17",
+        Statement = [
+            {
+                Sid = "FullBucketAccess",
+                Effect = "Allow",
+                Principal = {
+                    "AWS": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+                },
+                Action = [
+                          "s3:GetObject",
+                          "s3:PutObject",
+                          "s3:PutObjectAcl",
+                          "s3:DeleteObject",
+                          #"s3:HeadObject"
+                         ],
+                Resource = "${aws_s3_bucket.website_staging.arn}/*"
+            }
+        ]
+    })
+}
+
 output "bucket_website_url_staging" {
     value = aws_s3_bucket_website_configuration.website_hosting_staging.website_endpoint
 }

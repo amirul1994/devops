@@ -67,7 +67,9 @@ resource "aws_s3_bucket_policy" "website_prod_policy" {
                 Resource = "${aws_s3_bucket.website_prod.arn}/*"
             }
         ]
-    })
+    }) 
+
+    depends_on = [aws_s3_bucket_public_access_block.website_prod_public_access]
 }
 
 output "bucket_website_url_prod" {

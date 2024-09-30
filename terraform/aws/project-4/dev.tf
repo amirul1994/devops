@@ -66,9 +66,12 @@ resource "aws_s3_bucket_policy" "website_dev_policy" {
                           "s3:PutObject",
                           "s3:PutObjectAcl",
                           "s3:DeleteObject",
-                          #"s3:HeadObject"
-                         ]
-                Resource = "${aws_s3_bucket.website_dev.arn}/*"
+                        ],
+                
+                Resource = [
+                    "${aws_s3_bucket.website_dev.arn}/*",
+                    "${aws_s3_bucket.website_dev.arn}"
+                ]
             }
         ]
     })

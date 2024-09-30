@@ -82,52 +82,6 @@ Here is the requested format:
 
    i) Monitor traffic and access patterns using CloudWatch metrics.
 
----
-
-project-4/
-
-├── main.tf
-
-├── variables.tf
-
-├── outputs.tf
-
-├── terraform.tfvars
-
-├── modules/
-│   
-    ├── s3/
-|   |   ├── main.tf
-│   │   ├── variables.tf
-│   │   ├── outputs.tf
-
-│   ├── cloudfront/
-│   │   ├── main.tf
-│   │   ├── variables.tf
-│   │   ├── outputs.tf
-
-│   ├── iam/
-│   │   ├── main.tf
-│   │   ├── variables.tf
-│   │   ├── outputs.tf
-
-├── environments/
-
-│   ├── dev/
-│   │   ├── main.tf
-│   │   ├── variables.tf
-│   │   ├── terraform.tfvars
-
-│   ├── staging/
-│   │   ├── main.tf
-│   │   ├── variables.tf
-│   │   ├── terraform.tfvars
-
-│   ├── prod/
-│   │   ├── main.tf
-│   │   ├── variables.tf
-│   │   ├── terraform.tfvars
-
 
 ACM Certificates and CloudFront
 Global Certificates: ACM certificates issued in the us-east-1 region (N. Virginia) are considered global certificates. These certificates can be used with AWS services that require global certificates, such as Amazon CloudFront.

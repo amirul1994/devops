@@ -65,9 +65,12 @@ resource "aws_s3_bucket_policy" "website_staging_policy" {
                           "s3:PutObject",
                           "s3:PutObjectAcl",
                           "s3:DeleteObject",
-                          #"s3:HeadObject"
-                         ],
-                Resource = "${aws_s3_bucket.website_staging.arn}/*"
+                        ],
+                
+                Resource = [
+                    "${aws_s3_bucket.website_staging.arn}/*",
+                    "${aws_s3_bucket.website_staging.arn}"
+                    ]
             }
         ]
     })

@@ -43,6 +43,35 @@ resource "aws_s3_bucket_policy" "website_log_policy" {
                         "aws:SourceArn" = "arn:aws:cloudfront::${data.aws_caller_identity.current.account_id}:distribution/${aws_cloudfront_distribution.website_prod_distribution.id}"
                     }
                 }
+            }, 
+            
+            {
+                Effect = "Allow",
+                Principal = {
+                    Service = "cloudfront.amazonaws.com"
+                }, 
+            
+                Action = "s3:GetBucketAcl",
+                Resource = aws_s3_bucket.website_log.arn
+            }, 
+
+            {
+                Effect = "Allow",
+                Principal = {
+                    AWS = "*"
+                }, 
+
+                Action = "s3:PutObject",
+                Resource = "${aws_s3_bucket.website_log.arn}/*",
+                Condition = {
+                    ArnLike = {
+                        "aws:SourceArn" = [
+                            "arn:aws:s3:::website_dev",
+                            "arn:aws:s3:::website_staging",
+                            "arn:aws:s3:::website_prod"
+                        ]
+                    }
+                }
             }
         ]
     })
@@ -55,4 +84,12 @@ resource "aws_s3_bucket_public_access_block" "website_log_public_access" {
     block_public_acls = true 
     ignore_public_acls = true 
     restrict_public_buckets = true
+} 
+
+resource "aws_s3_bucket_ownership_controls" "website_log_ownership" {
+    bucket = aws_s3_bucket.website_log.id 
+
+    rule {
+        object_ownership = "BucketOwnerPreferred"
+    }
 }

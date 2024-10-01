@@ -74,6 +74,13 @@ resource "aws_s3_bucket_policy" "website_staging_policy" {
             }
         ]
     })
+} 
+
+resource "aws_s3_bucket_logging" "website_staging_logging" {
+    bucket = aws_s3_bucket.website_staging.id 
+
+    target_bucket = aws_s3_bucket.website_log.bucket 
+    target_prefix = "staging-log/"
 }
 
 output "bucket_website_url_staging" {

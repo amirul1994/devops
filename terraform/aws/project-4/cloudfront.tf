@@ -18,6 +18,14 @@ resource "aws_cloudfront_distribution" "website_prod_distribution" {
    
    default_root_object = "index.html"
 
+   logging_config {
+    bucket = "${aws_s3_bucket.website_log.bucket}.s3.amazonaws.com"
+    
+    include_cookies = false 
+    
+    prefix = "cloudfront-prod-log/"
+   }
+
    default_cache_behavior {
     allowed_methods = ["GET", "HEAD"]
     cached_methods = ["GET", "HEAD"]

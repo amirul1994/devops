@@ -5,7 +5,7 @@ resource "aws_s3_bucket" "website_dev" {
         Name = "my-website-dev"
         Environment = "dev"
     }
-}  
+}
 
 resource "aws_s3_bucket_lifecycle_configuration" "website_dev_lifecycle" {
     bucket = aws_s3_bucket.website_dev.bucket
@@ -75,6 +75,13 @@ resource "aws_s3_bucket_policy" "website_dev_policy" {
             }
         ]
     })
+}
+
+resource "aws_s3_bucket_logging" "website_dev_logging" {
+    bucket = aws_s3_bucket.website_dev.id
+
+    target_bucket = aws_s3_bucket.website_log.bucket 
+    target_prefix = "dev-log/"
 }
 
 output "bucket_website_url_dev" {

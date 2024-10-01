@@ -4,7 +4,7 @@ resource "aws_s3_bucket" "website_prod" {
     tags = {
         Name = "my-website-prod"
         Environment = "prod"
-    }
+    } 
 } 
 
 resource "aws_s3_bucket_lifecycle_configuration" "website_prod_lifecycle" {
@@ -75,6 +75,13 @@ resource "aws_s3_bucket_policy" "website_prod_policy" {
     }) 
 
     depends_on = [aws_s3_bucket_public_access_block.website_prod_public_access]
+}
+
+resource "aws_s3_bucket_logging" "website_prod_logging" {
+    bucket = aws_s3_bucket.website_prod.id 
+
+    target_bucket = aws_s3_bucket.website_log.bucket 
+    target_prefix = "prod-log/"
 }
 
 output "bucket_website_url_prod" {

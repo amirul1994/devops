@@ -1,7 +1,7 @@
 ![s3_terraform](https://github.com/user-attachments/assets/ed43871b-3987-4377-bd13-4b84a367e74d)
 
 
-Project Title: "Multi-Environment Static Website Hosting with S3 and CloudFront"
+Project Title: "Multi-Environment Static Website Hosting with S3 and CloudFront using Terraform"
 
 Project Goal:
 

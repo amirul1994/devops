@@ -3,6 +3,11 @@ variable "s3_buckets" {
     type = map(string)
 }
 
+variable "cloudfront_distribution_id" {
+    description = "CloudFront Distribution ID"
+    type = string
+}
+
 resource "aws_cloudwatch_metric_alarm" "s3_bucket_size_bytes_alarm" {
     for_each = var.s3_buckets
     alarm_name = "${each.key}_BucketSizeBytes_Alarm"
@@ -173,4 +178,38 @@ resource "aws_cloudwatch_metric_alarm" "s3_delete_request_alarm" {
     }
 
     alarm_description = "Alarm when DELETE requests exceed 100 in 5 minutes"
+}
+
+resource "aws_cloudwatch_metric_alarm" "cloudfront_cache_hit_rate_alarm" {
+    alarm_name = "CloudFrontCacheHitRateAlarm"
+    comparison_operator = "LessThanThreshold"
+    evaluation_periods = 1
+    metric_name = "CacheHitRate"
+    namespace = "AWS/CloudFront"
+    period = 300 
+    statistic = "Average"
+    threshold = 80 
+    dimensions = {
+        DistributionId = var.cloudfront_distribution_id
+        Region = "Global"
+    }
+
+    alarm_description = "Alarm when CloudFront cache hit rate falls below 80%"
+}
+
+resource "aws_cloudwatch_metric_alarm" "cloudfront_origin_latency_alarm" {
+    alarm_name = "CloudFrontOriginalLatencyAlarm"
+    comparison_operator = "GreaterThanThreshold"
+    evaluation_periods = 1
+    metric_name = "OriginLatency"
+    namespace = "AWS/CloudFront"
+    period = 300
+    statistic = "Average"
+    threshold = 500 
+    dimensions = {
+        DistributionId = var.cloudfront_distribution_id
+        Region = "Global"
+    }
+
+    alarm_description = "Alarm when CloudFront origin latency exceeds 500ms"
 }

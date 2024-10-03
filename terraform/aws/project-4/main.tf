@@ -12,4 +12,6 @@ module "cloudwatch_s3_monitoring" {
         staging = aws_s3_bucket.website_staging.arn
         prod = aws_s3_bucket.website_prod.arn
     }
+
+    cloudfront_distribution_id = aws_cloudfront_distribution.website_prod_distribution.id
 }

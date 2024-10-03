@@ -151,3 +151,5 @@ a) Set up Storage Class Analysis on your S3 buckets to monitor the access patter
 - i) This will provide insights into which objects are being accessed frequently and which ones are not.
 
 - ii) Use CloudWatch to visualize and analyze these insights to optimize storage costs and improve performance.
+
+The assume_role_policy is a JSON policy document that defines which entities (such as AWS services or IAM users) are allowed to assume the role. In the context of an IAM role, the assume_role_policy specifies the trust relationship between the role and the entities that can assume it.

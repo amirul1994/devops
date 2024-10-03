@@ -47,5 +47,3 @@ resource "aws_iam_role_policy_attachment" "lambda_policy_attach" {
     role = aws_iam_role.lambda_exec_role.name 
     policy_arn = aws_iam_policy.lambda_policy.arn
 }
-
-resource "aws_lambda_function" "process_s3_logs" 

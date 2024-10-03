@@ -153,3 +153,19 @@ a) Set up Storage Class Analysis on your S3 buckets to monitor the access patter
 - ii) Use CloudWatch to visualize and analyze these insights to optimize storage costs and improve performance.
 
 The assume_role_policy is a JSON policy document that defines which entities (such as AWS services or IAM users) are allowed to assume the role. In the context of an IAM role, the assume_role_policy specifies the trust relationship between the role and the entities that can assume it.
+
+ARN Format: The Amazon Resource Name (ARN) format for CloudWatch Logs resources is:
+
+Copy code
+arn:aws:logs:<region>:<account-id>:<resource-type>:<resource-name>
+<region>: The AWS region.
+
+<account-id>: The AWS account ID.
+
+<resource-type>: The type of CloudWatch Logs resource (e.g., log-group, log-stream).
+
+<resource-name>: The name of the specific resource.
+
+Wildcard Usage: The wildcard * is used to match any value in the specified position. For example:
+
+arn:aws:logs:*:*:* matches any CloudWatch Logs resource in any region and any account.

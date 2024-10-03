@@ -12,3 +12,4 @@
 *.backup
 *.swp
 .terraform.lock.hcl
+bfg-1.14.0.jar

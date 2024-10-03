@@ -6,6 +6,11 @@ variable "s3_buckets" {
 variable "cloudfront_distribution_id" {
     description = "CloudFront Distribution ID"
     type = string
+} 
+
+variable "sns_topic_arn" {
+    description = "SNS Topic ARN for CloudWatch Alarms"
+    type = string 
 }
 
 resource "aws_cloudwatch_metric_alarm" "s3_bucket_size_bytes_alarm" {
@@ -24,6 +29,8 @@ resource "aws_cloudwatch_metric_alarm" "s3_bucket_size_bytes_alarm" {
     } 
 
     alarm_description = "Alarm when the bucket size exceeds 5GB"
+    actions_enabled = true 
+    alarm_actions = [var.sns_topic_arn] 
 } 
 
 resource "aws_cloudwatch_metric_alarm" "s3_number_of_objects_alarm" {
@@ -42,6 +49,8 @@ resource "aws_cloudwatch_metric_alarm" "s3_number_of_objects_alarm" {
     }
 
     alarm_description = "Alarm when the number of objects exceeds 1000"
+    actions_enabled = true
+    alarm_actions = [var.sns_topic_arn]
 } 
 
 resource "aws_cloudwatch_metric_alarm" "s3_all_requests_alarm" {
@@ -59,6 +68,8 @@ resource "aws_cloudwatch_metric_alarm" "s3_all_requests_alarm" {
     }
 
     alarm_description = "Alarm when the total requests exceed 300 in 2 minutes" 
+    actions_enabled = true
+    alarm_actions = [var.sns_topic_arn]
 } 
 
 resource "aws_cloudwatch_metric_alarm" "s3_4xx_errors_alarm" {
@@ -76,6 +87,8 @@ resource "aws_cloudwatch_metric_alarm" "s3_4xx_errors_alarm" {
     } 
 
     alarm_description = "Alarm when 4xx errors exceed 50 in 5 minutes"
+    actions_enabled = true
+    alarm_actions = [var.sns_topic_arn]
 } 
 
 resource "aws_cloudwatch_metric_alarm" "s3_5xx_erros_alarm" {
@@ -93,6 +106,8 @@ resource "aws_cloudwatch_metric_alarm" "s3_5xx_erros_alarm" {
     }
 
     alarm_description = "Alarm when 5xx errors exceed 10 in 5 minutes"
+    actions_enabled = true
+    alarm_actions = [var.sns_topic_arn]
 } 
 
 resource "aws_cloudwatch_metric_alarm" "s3_first_byte_latency_alarm" {
@@ -110,6 +125,8 @@ resource "aws_cloudwatch_metric_alarm" "s3_first_byte_latency_alarm" {
     }
 
     alarm_description = "Alarm when the first byte latency exceeds 1 second"
+    actions_enabled = true
+    alarm_actions = [var.sns_topic_arn]
 } 
 
 resource "aws_cloudwatch_metric_alarm" "s3_total_request_latency_alarm" {
@@ -127,6 +144,8 @@ resource "aws_cloudwatch_metric_alarm" "s3_total_request_latency_alarm" {
     } 
 
     alarm_description = "Alarm when the total requets latency exceeds 2 seconds"
+    actions_enabled = true
+    alarm_actions = [var.sns_topic_arn]
 } 
 
 resource "aws_cloudwatch_metric_alarm" "s3_request_alarm" {
@@ -144,6 +163,8 @@ resource "aws_cloudwatch_metric_alarm" "s3_request_alarm" {
     } 
 
     alarm_description = "Alarm when GET requests exceeds 1000 in 5 minutes"
+    actions_enabled = true
+    alarm_actions = [var.sns_topic_arn]
 } 
 
 resource "aws_cloudwatch_metric_alarm" "s3_put_request_alarm" {
@@ -161,6 +182,8 @@ resource "aws_cloudwatch_metric_alarm" "s3_put_request_alarm" {
     } 
 
     alarm_description = "Alarm when PUT requests exceed 1000 in 5 minutes"
+    actions_enabled = true
+    alarm_actions = [var.sns_topic_arn]
 } 
 
 resource "aws_cloudwatch_metric_alarm" "s3_delete_request_alarm" {
@@ -178,6 +201,8 @@ resource "aws_cloudwatch_metric_alarm" "s3_delete_request_alarm" {
     }
 
     alarm_description = "Alarm when DELETE requests exceed 100 in 5 minutes"
+    actions_enabled = true
+    alarm_actions = [var.sns_topic_arn]
 }
 
 resource "aws_cloudwatch_metric_alarm" "cloudfront_cache_hit_rate_alarm" {
@@ -195,6 +220,8 @@ resource "aws_cloudwatch_metric_alarm" "cloudfront_cache_hit_rate_alarm" {
     }
 
     alarm_description = "Alarm when CloudFront cache hit rate falls below 80%"
+    actions_enabled = true
+    alarm_actions = [var.sns_topic_arn]
 }
 
 resource "aws_cloudwatch_metric_alarm" "cloudfront_origin_latency_alarm" {
@@ -212,4 +239,6 @@ resource "aws_cloudwatch_metric_alarm" "cloudfront_origin_latency_alarm" {
     }
 
     alarm_description = "Alarm when CloudFront origin latency exceeds 500ms"
+    actions_enabled = true
+    alarm_actions = [var.sns_topic_arn]
 }

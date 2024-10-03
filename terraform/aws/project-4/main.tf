@@ -14,4 +14,5 @@ module "cloudwatch_s3_monitoring" {
     }
 
     cloudfront_distribution_id = aws_cloudfront_distribution.website_prod_distribution.id
+    sns_topic_arn = module.cloudwatch_s3_monitoring.sns_topic_arn
 }

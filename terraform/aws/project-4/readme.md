@@ -96,3 +96,58 @@ CloudFront Requirement: If you are using Amazon CloudFront for content delivery,
 
 
 The origin_access_identity must be a valid OAI ID that you have created in your AWS account.
+
+
+1) Enable S3 Server Access Logs
+
+a) Ensure that server access logging is enabled on your S3 buckets.
+
+- i) Server access logging helps you track requests made to your bucket, providing detailed access logs for security and monitoring purposes.
+
+2) Use S3 CloudWatch Metrics
+
+a) Enable default CloudWatch metrics for your S3 buckets to monitor key performance indicators (KPIs).
+
+- i) BucketSizeBytes: Total size of the bucket.
+
+- ii) NumberOfObjects: Number of objects in the bucket.
+
+- iii) AllRequests: Total number of requests made to the bucket.
+
+- iv) 4xxErrors: Client error metrics (e.g., 404 errors).
+
+- v) 5xxErrors: Server error metrics (e.g., 500 errors).
+
+- vi) FirstByteLatency: Time for the first byte of data to be received.
+
+- vii) TotalRequestLatency: Total time it takes to complete a request.
+
+3) Configure Event Notifications
+
+a) Set up event notifications to capture specific S3 actions (e.g., object created, object deleted).
+
+- i) Configure the notifications to trigger Lambda functions or other AWS services.
+
+- ii) These services can process events and send data to CloudWatch for further analysis.
+
+4) CloudWatch Alarms
+
+a) Create CloudWatch alarms to monitor specific metrics for anomalies or performance thresholds.
+
+- i) Set alarms for key metrics like request count, error rates, or bucket size exceeding a predefined limit.
+
+- ii) Configure notifications to alert you via email, SMS, or other communication channels when an alarm condition is met.
+
+5) CloudWatch Logs
+
+a) Enable logging on specific S3 actions and send the logs directly to CloudWatch Logs.
+
+- i) CloudWatch Logs will help you monitor and analyze access patterns, security issues, and performance metrics related to your S3 buckets.
+
+6) Storage Class Analysis
+
+a) Set up Storage Class Analysis on your S3 buckets to monitor the access patterns of your stored objects.
+
+- i) This will provide insights into which objects are being accessed frequently and which ones are not.
+
+- ii) Use CloudWatch to visualize and analyze these insights to optimize storage costs and improve performance.

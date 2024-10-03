@@ -84,6 +84,12 @@ resource "aws_s3_bucket_logging" "website_dev_logging" {
     target_prefix = "dev-log/"
 }
 
+resource "aws_s3_object" "sample_object" {
+    bucket = aws_s3_bucket.website_dev.bucket
+    key = "sample/sample.txt"
+    source = "sample.txt"
+}
+
 output "bucket_website_url_dev" {
     value = aws_s3_bucket_website_configuration.website_hosting_dev.website_endpoint
 }

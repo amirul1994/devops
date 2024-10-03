@@ -82,6 +82,12 @@ resource "aws_s3_bucket_logging" "website_prod_logging" {
 
     target_bucket = aws_s3_bucket.website_log.bucket 
     target_prefix = "prod-log/"
+} 
+
+resource "aws_s3_object" "sample3_object" {
+    bucket = aws_s3_bucket.website_prod.bucket 
+    key = "sample/sample.txt"
+    source = "sample3.txt"
 }
 
 output "bucket_website_url_prod" {

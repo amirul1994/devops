@@ -83,6 +83,12 @@ resource "aws_s3_bucket_logging" "website_staging_logging" {
     target_prefix = "staging-log/"
 }
 
+resource "aws_s3_object" "sample2_object" {
+    bucket = aws_s3_bucket.website_staging.bucket
+    key = "sample/sample.txt"
+    source = "sample2.txt"
+}
+
 output "bucket_website_url_staging" {
     value = aws_s3_bucket_website_configuration.website_hosting_staging.website_endpoint
 }

@@ -236,3 +236,56 @@ resource "aws_db_instance" "mysql_rds" {
 
 }
 
+resource "tls_private_key" "bastion_ssh_key" {
+    algorithm = "RSA"
+    rsa_bits = 4096
+} 
+
+resource "aws_key_pair" "bastion_key" {
+    key_name = "bastion-key"
+    public_key = tls_private_key.bastion_ssh_key.public_key_openssh
+} 
+
+resource "local_file" "private_key" {
+    content = tls_private_key.bastion_ssh_key.private_key_pem
+    filename = "${path.module}/bastion-key.pem"
+} 
+
+resource "aws_security_group" "bastion_sg" {
+    vpc_id = aws_vpc.db_vpc.id
+
+    ingress {
+        from_port = 22
+        to_port = 22
+        protocol = "tcp"
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+
+    egress {
+        from_port = 0
+        to_port = 0
+        protocol = "-1"
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+
+    tags = {
+        Name = "bastion-ng"
+    }
+}
+
+resource "aws_instance" "bastion" {
+    ami = "ami-0866a3c8686eaeeba"
+    instance_type = "t2.micro"
+    subnet_id = aws_subnet.pub_sbnt.id 
+    key_name = aws_key_pair.bastion_key.key_name
+
+    vpc_security_group_ids = [aws_security_group.bastion_sg.id]
+
+    tags = {
+        Name = "bastion-host"
+    }
+} 
+
+output "bastion_public_ip" {
+    value = aws_instance.bastion.public_ip
+}

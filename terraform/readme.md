@@ -26,7 +26,9 @@ terraform apply -target aws_instance.web-server-instace
 map() - In Terraform, the map() function is used to create a map from a set of key-value pairs.
 
 lookup() - Returns the value of a specified key from a map, with an optional default value if the key is not found.
-    
+
+element() - Returns a single element from a list at a specified index, with optional wrapping behavior.
+
 coalesce() - Returns the first non-null and non-empty value from a series of arguments.
     
 coalescelist() - Returns the first non-empty list from a series of lists.

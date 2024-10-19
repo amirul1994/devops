@@ -20,7 +20,9 @@ variable "vpc_config" {
 } 
 
 variable "public_subnet_configs" {
-    type = list(object({
-        cidr_block = string,
-    }))
+    type = list(map(string))
+}
+
+variable "private_subnet_configs" {
+    type = list(map(string))
 }

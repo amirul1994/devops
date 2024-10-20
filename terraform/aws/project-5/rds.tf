@@ -227,6 +227,11 @@ resource "aws_db_instance" "mysql_rds" {
 
     vpc_security_group_ids = [aws_security_group.rds_sg.id] 
 
+    enabled_cloudwatch_logs_exports = ["error", "general", "slowquery"]
+    apply_immediately = true
+
+    iam_database_authentication_enabled = true
+
     lifecycle {
         create_before_destroy = true
     }

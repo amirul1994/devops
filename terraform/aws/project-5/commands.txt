@@ -5,3 +5,15 @@ CREATE USER 'iam_user'@'%' IDENTIFIED WITH AWSAuthenticationPlugin;
 GRANT SELECT, INSERT, UPDATE, DELETE ON *.* TO 'iam_user'@'%' WITH GRANT OPTION;  
 
 aws rds generate-db-auth-token --hostname <rds-endpoint> --port 3306 --username iam_user
+
+after configuring aws secret manager
+
+connect to rds instance from bastion
+
+1. install aws cli
+
+2. get the password
+
+aws secretsmanager get-secret-value --secret-id rds_password_secret --query SecretString --output text
+
+3. connect

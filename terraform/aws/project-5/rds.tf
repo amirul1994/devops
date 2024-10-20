@@ -201,11 +201,16 @@ resource "aws_db_subnet_group" "rds_sbnt_grp" {
     }
 } 
 
-variable "rds_passwd" {
-    description = "the password for the rds master user"
-    type = string 
+# variable "rds_passwd" {
+#     description = "the password for the rds master user"
+#     type = string 
 
-    sensitive = true
+#     sensitive = true
+# }
+
+data "aws_secretsmanager_secret_version" "rds_password" {
+    secret_id = aws_secretsmanager_secret.rds_secret.id
+    depends_on = [aws_secretsmanager_secret_version.rds_secret_version]
 }
 
 resource "aws_db_instance" "mysql_rds" {
@@ -217,7 +222,7 @@ resource "aws_db_instance" "mysql_rds" {
     storage_type = "gp2"
     engine_version = "8.0.32"
     username = "admin"
-    password = var.rds_passwd
+    password = jsondecode(data.aws_secretsmanager_secret_version.rds_password.secret_string)["password"]
     
     db_subnet_group_name = aws_db_subnet_group.rds_sbnt_grp.name
     multi_az = true

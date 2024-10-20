@@ -16,7 +16,7 @@ resource "null_resource" "ssh_bastion" {
         inline = [
             "sudo apt update -y",
             "sudo apt install mysql-client -y",
-            "export RDS_PASSWD='${var.rds_passwd}'"
+            # "export RDS_PASSWD='${var.rds_passwd}'"
         ]
     }
 } 

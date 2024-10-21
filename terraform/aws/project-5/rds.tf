@@ -201,17 +201,17 @@ resource "aws_db_subnet_group" "rds_sbnt_grp" {
     }
 } 
 
-# variable "rds_passwd" {
-#     description = "the password for the rds master user"
-#     type = string 
+variable "rds_passwd" {
+    description = "the password for the rds master user"
+    type = string 
 
-#     sensitive = true
-# }
-
-data "aws_secretsmanager_secret_version" "rds_password" {
-    secret_id = aws_secretsmanager_secret.rds_secret.id
-    depends_on = [aws_secretsmanager_secret_version.rds_secret_version]
+    sensitive = true
 }
+
+# data "aws_secretsmanager_secret_version" "rds_password" {
+#     secret_id = aws_secretsmanager_secret.rds_secret.id
+#     depends_on = [aws_secretsmanager_secret_version.rds_secret_version]
+# }
 
 resource "aws_db_instance" "mysql_rds" {
     identifier = "amir-db"
@@ -222,7 +222,8 @@ resource "aws_db_instance" "mysql_rds" {
     storage_type = "gp2"
     engine_version = "8.0.32"
     username = "admin"
-    password = jsondecode(data.aws_secretsmanager_secret_version.rds_password.secret_string)["password"]
+    # password = jsondecode(data.aws_secretsmanager_secret_version.rds_password.secret_string)["password"]
+    password = var.rds_passwd
     
     db_subnet_group_name = aws_db_subnet_group.rds_sbnt_grp.name
     multi_az = true
@@ -296,6 +297,16 @@ resource "aws_instance" "bastion" {
         Name = "bastion-host"
     }
 } 
+
+resource "aws_sns_topic" "alarm_notifications" {
+    name = "RDSAlarmNotifications"
+} 
+
+resource "aws_sns_topic_subscription" "email_subscription" {
+    topic_arn = aws_sns_topic.alarm_notifications.arn
+    protocol = "email"
+    endpoint = "sample@example.com"
+}
 
 output "bastion_public_ip" {
     value = aws_instance.bastion.public_ip

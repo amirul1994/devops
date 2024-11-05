@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-app
+  labels:
+    app: my-app
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: my-app
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      containers:
+      - name: my-app-container
+        image: nginx:1.16.1
+        command: ["nginx"]
+        args: ["-g", "daemon off;"]
+        env:
+        - name: ENV_VAR_1
+          valueFrom:
+            configMapKeyRef:
+              name: my-config
+              key: key1
+        - name: ENV_VAR_2
+          valueFrom:
+            configMapKeyRef:
+              name: my-config
+              key: key2 
+        ports:
+        - containerPort: 80

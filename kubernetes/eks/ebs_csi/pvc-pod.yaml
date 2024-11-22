@@ -1,0 +1,30 @@
+# PVC
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ebs-pvc-new
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: ebs-sc
+  resources:
+    requests:
+      storage: 10Gi
+---
+# Re-deploy pod
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ebs-pod-new
+spec:
+  containers:
+  - name: app
+    image: busybox
+    command: [ "sh", "-c", "echo Hello Kubernetes! && sleep 3600" ]
+    volumeMounts:
+    - mountPath: "/data"
+      name: ebs-storage
+  volumes:
+  - name: ebs-storage
+    persistentVolumeClaim:
+      claimName: ebs-pvc-new

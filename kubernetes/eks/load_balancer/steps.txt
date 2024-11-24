@@ -1,0 +1,180 @@
+Create an EKS cluster with the name 'demo-eks' with the following specifications
+1. Click on the create cluster
+
+2. There are 6 sections to be configured.
+
+Section 1 (Configure Cluster)
+1. Name: demo-eks
+2. Version: 1.29
+3. Cluster Service Role: eksClusterRole
+4. Leave the rest of the options default and click on NEXT
+
+Section2 (Networking)
+1. VPC : Default vpc
+2. Subnets: us-east-1a,us-east-1b,us-east-1c. Remove any other subnets if
+selected by default.
+3. Leave the rest of the options default and click on NEXT.
+
+Section3 (Observability)
+1. Leave the options as default and click on NEXT.
+Section4 (Add-ons)
+1. Leave the default selection and click on NEXT.
+
+Section5(Configure selected add-ons settings)
+1. Leave the default selection and click on NEXT.
+Section6
+1. Review the configuration and click on Create
+
+It will take around 10-15 mins for the cluster to be in active status.
+Note: Create the resource only in us-east-1 region.
+
+1. Navigate to the CloudFormation service in AWS Console.
+2. Click on Create Stack drop-down and select with new resources (standard)
+3. In step1 under Prerequisite – Prepare template section select *Choose an existing
+template*
+4. In specify template section select Amazon S3 URL as the template source.
+Use the below s3 URL as the source
+https://s3.us-west-2.amazonaws.com/amazon-eks/cloudformation/2022-12-23/amazon-
+eks-nodegroup.yamlclick on Next .
+5. On the Specify stack details page,
+a. Stack name: Enter ‘eks-cluster-stack’ for your AWS CloudFormation stack.
+b. ClusterName: Enter ‘demo-eks’ as name that you used when you created your Amazon
+EKS cluster. This name must be the same as the cluster name or your nodes can’t join the
+cluster.
+c. ClusterControlPlaneSecurityGroup: Choose the security group of the cluster control
+plane.
+d. NodeGroupName: Enter ‘eks-demo-node’ for your node group.
+e. NodeImageIdSSMParam: Pre-populated with the Amazon EC2 Systems Manager
+parameter of a recent Amazon EKS optimized AMI for a variable Kubernetes version. If you
+want to use version 1.29, you can update the field to
+/aws/service/eks/optimized-ami/1.29/amazon-linux-2/recommende
+d/image_id
+f. KeyName: Select the name of an Amazon EC2 SSH key pair that you can use to connect
+using SSH into your nodes after they launch.
+g. VpcId: Select the VPC as same as the EKS cluster
+h. Subnets: Select the subnets as same as EKS cluster (us-east-1a, us-east-1b, us-east-1c).
+
+Note: There are some limitations on the instance size. They are as follows:
+Choose one of these instance types: .nano, micro, .small, .medium of t1,t2, and t3 instance class.
+Choose the disk type as “gp2” only.
+
+The maximum disk size per node allowed is 30GB.
+6. Select your desired choices on the Configure stack options page and then choose Next
+7. On the box below, stick I acknowledge that AWS CloudFormation might create IAM
+resources and then choose Submit.
+
+Note: It will take some time for resources to be configured.
+Once the cluster is created, enable kubectl to communicate with your cluster by adding a new
+context to the kubectl config file by executing the following command in the lab terminal. Run the
+below command to add new context.
+
+aws eks update-kubeconfig --region us-east-1 --name demo-eks
+
+After node group creation is completed from CloudFormation, we need to join worker nodes to
+controlplane.
+
+1. Edit the /root/aws-auth-cm.yaml file with the value of Role ARN key to
+NodeInstanceRole value which is created by CloudFormation stack. (We can get the ARN
+value of NodeInstanceRole from the Output section of CloudFormation stack.
+2. Now, apply the changes
+kubectl apply -f aws-auth-cm.yaml
+
+It will take some time for nodes to attain an active state.Let us configure the AWS LoadBalancer Controller.
+A Load Balancer yaml file (v2_7_2_full.yaml) is present under the root folder.
+Edit the yaml to use cluster demo-eks.
+
+Edit the below section
+apiVersion: apps/v1
+kind: Deployment
+. . .
+name: aws-load-balancer-controller
+namespace: kube-system
+spec:
+. . .
+template:
+spec:
+containers:
+- args:
+- --cluster-name=<your-cluster-name> ## update this to demo-
+eks
+Create the Load Balancer controller by using this YAML file.
+kubectl apply -f v2_7_2_full.yaml
+
+It will create all the required resources for the AWS load balancer to function.
+For detailed information, go through the page.
+Create a deployment (webapp-color) and service (webapp-color) to expose the deployment.
+Use the below yaml files for deployment.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+name: webapp-color
+labels:
+app: webapp-color
+spec:
+replicas: 3
+selector:
+matchLabels:
+app: webapp-color
+template:
+metadata:
+labels:
+app: webapp-color
+spec:
+containers:
+- name: webapp-color
+image: kodekloud/webapp-color
+ports:
+- containerPort: 8080
+Create a service with below yaml
+apiVersion: v1
+kind: Servicemetadata:
+name: webapp-color
+namespace: default
+annotations:
+service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+service.beta.kubernetes.io/aws-load-balancer-internal: "false" # Ensure this
+line is not set to "true"
+spec:
+type: LoadBalancer
+selector:
+app: webapp-color
+ports:
+- protocol: TCP
+port: 80
+targetPort: 8080
+
+Create the deployment and service with the below command.
+
+kubectl create -f <name of file>
+
+Note: It will take some time for the load balancer to get created and register targets.
+
+Navigate to the EC2 page. Check in the load balancer section for the load balancer created.
+Copy the DNS name to the browser, where you can access the content.
+you will see the following text.
+
+Hello from webapp-color-564cb8d898-j2shn!
+
+Now, we create a deployment with service as ingress type.
+
+In the root folder, there is a 2048_full.yaml file. Create a new deployment with this yaml file.
+kubectl create -f 2048_full.yaml
+
+This will create Namespace, Deployment, Ingress, and the service required to demonstrate the task.
+
+Inspect the resources.
+
+With Ingress, you can see an internet-facing ALB is created, and you can access the pods by
+a record of the Load Balancer.
+
+Use the below command.
+kubectl get ingress -n game-2048
+
+We can see the address below.
+
+k8s-game2048-ingress2-46dbc758ae-232597482.us-east-1.elb.amazonaws.com
+
+You can access the application from the browser.
+For more details and configuration, look into the load balancers created in the EC2 page in the AWS
+Console.

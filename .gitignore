@@ -1,6 +1,10 @@
 # Ignore .terraform directories in any subdirectory
 **/.terraform/
 
+# ignore node modules
+
+**/node_modules/
+
 # ignore .pem file
 *.pem
 

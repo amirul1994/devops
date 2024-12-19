@@ -6,3 +6,4 @@
     yum:
       name: sysstat
       state: present
+    when: ansible_os_family == "RedHat"

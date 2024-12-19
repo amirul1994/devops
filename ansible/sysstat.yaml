@@ -1,0 +1,8 @@
+- name: Install sysstat
+  hosts: webservers
+  become: yes
+  tasks: 
+  - name: Install sysstat on centos 9
+    yum:
+      name: sysstat
+      state: present

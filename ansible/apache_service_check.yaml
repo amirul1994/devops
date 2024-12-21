@@ -1,0 +1,22 @@
+- name: check apache service
+  hosts: servers
+  become: Yes
+  tasks:
+    - name: check apache on Ubuntu
+      service:
+        name: apache2
+        state: started
+      when: ansible_os_family == "Debian" 
+
+    - name: check apache on centos
+      service:
+        name: httpd
+        state: started
+      when: ansible_os_family == "RedHat"
+    
+    # check for apache running on docker
+    # - name: check if apache binary exists
+    #   stat:
+    #     path: /usr/sbin/apache2
+    #   register: apache_binary_check
+  

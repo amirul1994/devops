@@ -1,0 +1,9 @@
+- name: deploy app
+  hosts: s2
+  become: Yes
+  tasks:
+    - name: clone a git repo
+      git:
+        repo: https://github.com/Amirul1994/solar-system-gitea.git
+        dest: /var/www/myapp
+        update: yes

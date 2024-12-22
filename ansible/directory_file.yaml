@@ -1,0 +1,23 @@
+- name: directory & file creation
+  hosts: servers
+  become: Yes
+  tasks:
+    - name: directory & file creation in Ubuntu
+      file:
+        path: /root/dir1
+        state: directory
+        owner: root 
+        group: root 
+        mode: '0755'
+    
+    - name: create a file within the directory
+      copy: 
+        dest: /root/dir1/file1 
+        content: |
+          my name is a
+          age 39
+        owner: root 
+        group: root 
+        mode: '0644'
+
+      

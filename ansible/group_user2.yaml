@@ -1,0 +1,16 @@
+- name: group & user creation
+  hosts: servers
+  become: Yes 
+  tasks:
+    - name: group creation 
+      group:
+        name: marketing
+        state: present 
+    
+    - name: user creation
+      user:
+        name: robert
+        state: present 
+        shell: /bin/bash
+        groups: marketing 
+        append: yes

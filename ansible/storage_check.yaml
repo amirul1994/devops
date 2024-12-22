@@ -1,0 +1,11 @@
+- name: run commands on hosts
+  hosts: servers
+  become: Yes
+  tasks:
+    - name: check disk usage
+      command: df -h
+      register: disk_usage
+    
+    - name: display disk usage
+      debug:
+        var: disk_usage.stdout_lines

@@ -1,15 +1,30 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
-function SignupPage() {
-  const [username, setUsername] = useState('');
+function SignupPage({ setUsername, setIsLoggedIn }) {
+  const [usernameInput, setUsernameInput] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate();
 
-  const handleSignup = (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
-    // Handle signup logic here
-    console.log('Username:', username);
-    console.log('Password:', password);
+
+    try {
+      // Send data to the backend
+      const response = await axios.post('http://node-be:5000/api/signup', {
+        username: usernameInput,
+        password
+      });
+
+      // Handle success
+      setUsername(usernameInput);
+      setIsLoggedIn(true);
+      navigate('/profile');
+    } catch (error) {
+      console.error('Error registering user:', error);
+      alert('Error registering user. Please try again.');
+    }
   };
 
   return (
@@ -21,8 +36,8 @@ function SignupPage() {
             Username:
             <input
               type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={usernameInput}
+              onChange={(e) => setUsernameInput(e.target.value)}
               style={{ width: '100%', padding: '8px', marginTop: '5px' }}
             />
           </label>

@@ -1,15 +1,24 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
-function LoginPage() {
-  const [username, setUsername] = useState('');
+function LoginPage({ setUsername, setIsLoggedIn }) {
+  const [usernameInput, setUsernameInput] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    // Handle login logic
-    console.log('Username:', username);
-    console.log('Password:', password);
+
+    try {
+      // Simulate login (you can add proper authentication logic here)
+      setUsername(usernameInput);
+      setIsLoggedIn(true);
+      navigate('/profile');
+    } catch (error) {
+      console.error('Error logging in:', error);
+      alert('Invalid credentials. Please try again.');
+    }
   };
 
   return (
@@ -21,8 +30,8 @@ function LoginPage() {
             Username:
             <input
               type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={usernameInput}
+              onChange={(e) => setUsernameInput(e.target.value)}
               style={{ width: '100%', padding: '8px', marginTop: '5px' }}
             />
           </label>

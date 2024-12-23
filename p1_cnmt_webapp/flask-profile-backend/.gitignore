@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Virtual environment (named "flask")
+flask/
+
+# Flask
+instance/
+.env
+.flaskenv
+
+# Logs
+logs/
+*.log
+
+# IDE/editor files
+.vscode/
+.idea/
+
+# macOS system files
+.DS_Store
+
+# Sensitive files
+config.py
+*.ini
+*.cfg
+*.pem
+
+# Static and templates
+static/
+templates/
+
+# Testing
+.pytest_cache/
+htmlcov/
+.coverage
+
+# Database
+*.db
+*.sqlite
+
+# Migrations
+migrations/

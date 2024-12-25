@@ -16,6 +16,7 @@ bin/
 lib/
 lib64/
 
+
 # Testing & coverage
 .coverage
 .pytest_cache/

@@ -1,0 +1,39 @@
+# Python
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.so
+
+# Flask specific
+instance/
+.env
+.venv/
+env/
+venv/
+
+# Testing & coverage
+.coverage
+.pytest_cache/
+
+# IDE files
+.idea/
+.vscode/
+*.sublime-workspace
+*.sublime-project
+
+# Logs
+*.log
+
+# Temporary files
+*.swp
+*.bak
+
+# Build and dist
+build/
+dist/
+*.egg-info/
+
+# Docker
+.docker/
+docker-compose.override.yml

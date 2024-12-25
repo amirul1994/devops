@@ -1,33 +1,42 @@
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
-import LoginPage from './LoginPage';
-import SignupPage from './SignupPage';
-import ProfilePage from './ProfilePage';
+import React from "react";
+import { BrowserRouter as Router, Route, Routes, Link, useLocation } from "react-router-dom";
+import Login from "./Login";
+import Signup from "./Signup";
+import Profile from "./Profile";
+import "./App.css";
 
-function App() {
-  const [username, setUsername] = useState('');
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const navigate = useNavigate(); // Use useNavigate for redirection
+function Navbar() {
+  const location = useLocation();
 
-  const handleLogout = () => {
-    setUsername(''); // Clear the username
-    setIsLoggedIn(false); // Set login status to false
-    navigate('/'); // Redirect to the login page
-  };
+  // Hide the navbar on the Profile page
+  if (location.pathname.startsWith("/profile")) {
+    return null;
+  }
 
   return (
-    <div>
-      {isLoggedIn && (
-        <button onClick={handleLogout} style={{ margin: '10px', padding: '10px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: '5px' }}>
-          Logout
-        </button>
-      )}
-      <Routes>
-        <Route path="/" element={<LoginPage setUsername={setUsername} setIsLoggedIn={setIsLoggedIn} />} />
-        <Route path="/signup" element={<SignupPage setUsername={setUsername} setIsLoggedIn={setIsLoggedIn} />} />
-        <Route path="/profile" element={<ProfilePage username={username} handleLogout={handleLogout} />} />
-      </Routes>
-    </div>
+    <nav className="navbar">
+      <Link to="/" className="nav-link">
+        Login
+      </Link>
+      <Link to="/signup" className="nav-link">
+        Signup
+      </Link>
+    </nav>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <div className="app">
+        <Navbar /> {/* Render the navbar conditionally */}
+        <Routes>
+          <Route path="/" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/profile/:id" element={<Profile />} /> {/* Pass the `id` to the Profile page */}
+        </Routes>
+      </div>
+    </Router>
   );
 }
 

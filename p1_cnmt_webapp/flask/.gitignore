@@ -11,6 +11,10 @@ instance/
 .venv/
 env/
 venv/
+include/
+bin/
+lib/
+lib64/
 
 # Testing & coverage
 .coverage

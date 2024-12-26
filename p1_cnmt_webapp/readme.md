@@ -1,4 +1,5 @@
-  ![aws project](https://github.com/user-attachments/assets/f223b427-70fd-43a8-a6cc-e6f691bf70e3)
+![Pasted image](https://github.com/user-attachments/assets/5a18afbe-138b-4265-ab91-057521419de4)
+
 ## KubeDeploy: Multi-Tier App with Terraform, Ansible & CI/CD in EKS Cluster
 
 I will use the Application Load Balancer on the public subnet in multiple zones for high availability and fault tolerance. The private subnet will host the Webserver, RDS, and EKS Cluster. The Frontend will be deployed on ec2  instances with auto-scaling enabled, and RDS (MySQL) will be used as the database.

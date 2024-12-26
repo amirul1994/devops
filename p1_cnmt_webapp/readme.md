@@ -1,4 +1,5 @@
-![Pasted image](https://github.com/user-attachments/assets/5a18afbe-138b-4265-ab91-057521419de4)
+![image](https://github.com/user-attachments/assets/8b6053b6-75c0-4b96-87f8-3bf8668318bf)
+
 
 ## KubeDeploy: Multi-Tier App with Terraform, Ansible & CI/CD in EKS Cluster
 

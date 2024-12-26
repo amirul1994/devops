@@ -1,4 +1,5 @@
-![alt text](</home/amirul/interview/aws project.png>)     
+  ![aws project](https://github.com/user-attachments/assets/f223b427-70fd-43a8-a6cc-e6f691bf70e3)
+ 
 
 ## KubeDeploy: Multi-Tier App with Terraform, Ansible & CI/CD in EKS Cluster
 

@@ -1,4 +1,4 @@
-![alt text](<../../interview/aws project.png>)     
+![alt text](</home/amirul/interview/aws project.png>)     
 
 ## KubeDeploy: Multi-Tier App with Terraform, Ansible & CI/CD in EKS Cluster
 

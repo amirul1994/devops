@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
 const ImageUpload = () => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -6,6 +7,15 @@ const ImageUpload = () => {
   const [error, setError] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
+  const navigate = useNavigate();
+  const { id } = useParams(); // Get the `id` from the URL
+
+  // Check if the user is logged in (i.e., `id` exists)
+  useEffect(() => {
+    if (!id) {
+      navigate("/"); // Redirect to the login page if `id` is missing
+    }
+  }, [id, navigate]);
 
   // Handle file selection
   const handleFileChange = (event) => {

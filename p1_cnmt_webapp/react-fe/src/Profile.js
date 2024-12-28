@@ -93,8 +93,14 @@ function Profile() {
     navigate("/");
   };
 
+  // Navigate to the Image Upload Page with the `id`
   const handleImagePage = () => {
-    navigate("/image"); // Navigate to the Image Upload Page
+    navigate(`/image/${id}`); // Include the `id` in the URL
+  };
+
+  // Navigate to the File Upload Page with the `id`
+  const handleFilePage = () => {
+    navigate(`/file/${id}`); // Include the `id` in the URL
   };
 
   return (
@@ -150,7 +156,7 @@ function Profile() {
         </button>
       </div>
 
-      {/* Button to navigate to the Image Upload Page */}
+      {/* Buttons to navigate to the Image Upload Page and File Upload Page */}
       <div style={{ marginTop: "20px", textAlign: "center" }}>
         <button
           onClick={handleImagePage}
@@ -164,6 +170,20 @@ function Profile() {
           }}
         >
           Go to Image Upload Page
+        </button>
+        <button
+          onClick={handleFilePage}
+          style={{
+            color: "blue",
+            textDecoration: "underline",
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            fontSize: "16px",
+            marginLeft: "20px",
+          }}
+        >
+          Go to File Upload Page
         </button>
       </div>
 

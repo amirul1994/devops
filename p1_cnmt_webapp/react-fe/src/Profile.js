@@ -93,6 +93,10 @@ function Profile() {
     navigate("/");
   };
 
+  const handleImagePage = () => {
+    navigate("/image"); // Navigate to the Image Upload Page
+  };
+
   return (
     <div className="profile-container">
       <h2>Profile</h2>
@@ -143,6 +147,23 @@ function Profile() {
         </button>
         <button className="btn" onClick={handleLogout}>
           Logout
+        </button>
+      </div>
+
+      {/* Button to navigate to the Image Upload Page */}
+      <div style={{ marginTop: "20px", textAlign: "center" }}>
+        <button
+          onClick={handleImagePage}
+          style={{
+            color: "blue",
+            textDecoration: "underline",
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            fontSize: "16px",
+          }}
+        >
+          Go to Image Upload Page
         </button>
       </div>
 

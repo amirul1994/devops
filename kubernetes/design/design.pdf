@@ -1,0 +1,120 @@
+### Notes on High Availability (HA) in Kubernetes
+
+#### Introduction
+- **High Availability (HA)**: Ensures redundancy across all components in a Kubernetes cluster to avoid single points of failure.
+- **Focus**: Master nodes and control plane components in an HA setup.
+
+#### Key Concepts
+1. **Impact of Losing the Master Node**:
+   - Worker nodes and containers continue to run, but management capabilities are lost.
+   - If a pod crashes, the replication controller on the master cannot recreate it.
+   - The kube-api server becomes unavailable, preventing external access via `kubectl` or APIs.
+
+2. **HA Configuration**:
+   - **Redundancy**: Multiple master nodes to ensure continuous operation.
+   - **Components**: Master nodes host control plane components (API server, Controller Manager, Scheduler, ETCD).
+
+3. **Control Plane Components in HA**:
+   - **API Server**:
+     - Runs in active-active mode; multiple instances can handle requests simultaneously.
+     - A load balancer (e.g., NGINX, HAProxy) is used to distribute traffic between API servers.
+     - `kubectl` is configured to point to the load balancer.
+   - **Controller Manager and Scheduler**:
+     - Run in active-standby mode to avoid duplicate actions.
+     - Leader election process determines the active instance.
+     - **Leader Election**:
+       - Controllers compete for a lease on an endpoint object (e.g., `kube-controller-manager`).
+       - The first to update the endpoint becomes the active instance.
+       - Lease duration: 15 seconds (default), renewed every 10 seconds.
+       - Retry period: 2 seconds (default) for standby instances to attempt becoming the leader.
+   - **ETCD**:
+     - Two topologies for ETCD in Kubernetes:
+       - **Stacked Control Plane Nodes**:
+         - ETCD runs on the same nodes as the control plane.
+         - Easier to set up but risks losing both ETCD and control plane if a node fails.
+       - **External ETCD Servers**:
+         - ETCD runs on separate servers.
+         - More resilient but harder to set up and requires additional servers.
+     - The API server communicates with ETCD, and its configuration includes a list of ETCD servers.
+     - ETCD is distributed, so reads and writes can be performed through any instance.
+
+4. **Design Considerations**:
+   - **Master Nodes**: Multiple master nodes are essential for HA.
+   - **Load Balancer**: Required to distribute traffic to API servers.
+   - **ETCD Topology**: Choose between stacked or external ETCD based on risk tolerance and setup complexity.
+
+#### Practical Implementation
+- **Original Design**: Single master node.
+- **HA Design**:
+  - Multiple master nodes for redundancy.
+  - Load balancer for API server traffic.
+  - Total of 5 nodes in the cluster (including workers and masters).
+
+#### Conclusion
+- **HA Setup**: Ensures continuous operation and management of the Kubernetes cluster.
+- **Key Components**: API server, Controller Manager, Scheduler, and ETCD must be configured for redundancy.
+- **Recommendations**: Use a load balancer for API servers, configure leader election for controllers, and choose the appropriate ETCD topology based on your environment.
+
+
+### Notes on ETCD in High Availability (HA) Setup
+
+#### Introduction
+- **ETCD**: A distributed, reliable key-value store that is simple, secure, and fast.
+- **Purpose**: This lecture focuses on configuring ETCD in HA mode, which is a prerequisite for setting up Kubernetes in HA mode.
+
+#### Key Concepts
+1. **Key-Value Store**:
+   - Traditional data storage uses tables, while key-value stores use documents/pages.
+   - Each document contains all information about an individual, and changes to one document do not affect others.
+   - Complex data is often stored in formats like JSON or YAML.
+
+2. **Distributed Nature of ETCD**:
+   - ETCD can run on multiple servers, maintaining identical copies of the database.
+   - Ensures data consistency across all nodes, even if one node fails.
+
+3. **Leader Election and RAFT Protocol**:
+   - **Leader Election**: One node is elected as the leader, responsible for processing writes.
+   - **Followers**: Other nodes forward write requests to the leader.
+   - **RAFT Protocol**: Used for distributed consensus and leader election.
+     - Random timers initiate leader election.
+     - The first node to finish its timer requests to become the leader.
+     - Other nodes vote, and the node with the majority becomes the leader.
+     - The leader sends regular notifications to followers to maintain its role.
+     - If the leader fails, a re-election process is initiated.
+
+4. **Write Consistency**:
+   - Writes are only considered complete if the leader replicates the data to the majority of nodes (quorum).
+   - Quorum ensures data consistency across the cluster.
+
+5. **Quorum Calculation**:
+   - **Quorum**: The minimum number of nodes that must be available for the cluster to function.
+   - Formula: Quorum = (Total number of nodes / 2) + 1.
+   - Example: For 3 nodes, quorum is 2; for 5 nodes, quorum is 3.
+
+6. **Fault Tolerance**:
+   - **Fault Tolerance**: The number of nodes that can fail while keeping the cluster operational.
+   - For 3 nodes, fault tolerance is 1; for 5 nodes, it is 2.
+   - Having an odd number of nodes is preferred to avoid split-brain scenarios during network partitions.
+
+7. **Cluster Size Recommendations**:
+   - Minimum of 3 nodes for HA.
+   - Odd numbers (3, 5, 7) are preferred over even numbers to ensure quorum during network partitions.
+   - 5 nodes offer a good balance between fault tolerance and complexity.
+
+8. **Installation and Configuration**:
+   - Download the latest ETCD binary, extract it, and create the required directory structure.
+   - Copy over the necessary certificate files.
+   - Configure the ETCD service, specifying the initial cluster with peer information.
+   - Use the `etcdctl` utility to store and retrieve data.
+     - Set `ETCDCTL_API=3` for version 3 commands.
+     - Commands: `etcdctl put`, `etcdctl get`, `etcdctl get –keys-only`.
+
+#### Design Considerations
+- **HA Setup**: Minimum of 3 nodes for fault tolerance.
+- **Odd Number of Nodes**: Prevents cluster failure during network segmentation.
+- **Stacked Topology**: ETCD servers are placed on the master nodes themselves.
+
+#### Conclusion
+- **Recommendation**: Use 3 nodes for a basic HA setup, or 5 for higher fault tolerance.
+- **Practical Limitation**: On a laptop, 2 nodes may be used due to resource constraints, but 3 is ideal for a real HA environment.
+

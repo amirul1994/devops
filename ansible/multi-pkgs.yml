@@ -1,0 +1,7 @@
+---
+- hosts: web1
+  tasks:
+  - yum: name=sudo state=latest
+  - yum: name=vsftpd-3.0.3 state=present allow_downgrade=yes
+
+  

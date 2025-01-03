@@ -1,0 +1,8 @@
+---
+
+- hosts: web1
+  tasks:
+  - yum:
+      name: https://mirror.stream.centos.org/9-stream/AppStream/x86_64/os/Packages/wget-1.21.1-8.el9.x86_64.rpm
+      state: present
+

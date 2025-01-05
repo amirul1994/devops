@@ -1,0 +1,23 @@
+---
+- name: Add HTTPS firewall rule in internal zone
+  hosts: web1
+  become: yes
+  tasks:
+    - name: Add firewall source rule for Ansible controller IP
+      firewalld:
+        zone: internal
+        source: 172.20.1.2
+        permanent: yes
+        immediate: yes
+        state: enabled
+    
+    - name: Add HTTPS service rule in internal zone
+      firewalld:
+        zone: internal
+        service: https
+        permanent: yes
+        immediate: yes
+        state: enabled
+
+    - name: Reload firewalld to apply changes
+      command: firewall-cmd --reload

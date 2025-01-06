@@ -1,0 +1,6 @@
+---
+- name: Create a perm.txt
+  hosts: web1
+  tasks:
+   - name: Create  file perm.txt
+     file: path=/opt/data/perm.txt mode=0640 state=touch

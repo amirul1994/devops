@@ -1,0 +1,16 @@
+---
+- name: Create cron for apt
+  hosts: node00
+  gather_facts: no
+  tasks:
+    - name: Creates a cron
+      cron:
+        name: apt update
+        minute: 5
+        hour: 8
+        weekday: 0
+        month: '*'
+        day: 10
+        user: root
+        job: "apt update -y"
+        cron_file: ansible_apt

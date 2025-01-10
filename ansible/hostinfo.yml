@@ -1,0 +1,11 @@
+---
+- hosts: node00.host
+  gather_facts: false
+  tasks:
+    - name : hostinfo
+      template:
+        src: hostinfo.j2
+        dest: /root/hostinfo
+        owner: root
+        group: root
+        mode: '0644'

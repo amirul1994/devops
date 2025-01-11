@@ -1,0 +1,13 @@
+- name: Generate dns hosts files on americas servers
+  hosts: dns_server_america
+  tasks:
+  - template: src=templates/hosts.j2 dest=/tmp/hosts.txt
+    vars:
+      GROUP_NAME: america
+
+- name: Generate dns hosts files on asia servers
+  hosts: dns_server_asia
+  tasks:
+  - template: src=templates/hosts.j2 dest=/tmp/hosts.txt
+    vars:
+      GROUP_NAME: asia

@@ -1,0 +1,6 @@
+- hosts: all
+  tasks:
+    - template:
+        src: load-balancer.conf.j2
+        dest: /etc/nginx/conf.d/load-balancer.conf
+      run_once: yes

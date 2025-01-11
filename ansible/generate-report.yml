@@ -1,0 +1,8 @@
+- hosts: all
+  gather_facts: yes
+  tasks:
+    - template:
+        src: report.csv.j2
+        dest: /tmp/report.csv
+      delegate_to: reporting_server
+      run_once: yes

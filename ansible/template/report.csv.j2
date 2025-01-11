@@ -1,0 +1,4 @@
+hostname, free memory, uptime
+{% for host in groups['web'] %}
+{{ host }}, {{ hostvars[host]['ansible_memfree_mb'] }}, {{ hostvars[host]['ansible_uptime_seconds'] }}
+{% endfor %}

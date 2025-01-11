@@ -1,0 +1,14 @@
+## Query Histogram Metrics
+
+http_request_duration_seconds_bucket
+
+rate(http_request_duration_seconds_bucket[5m])
+
+histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))
+
+## Query Summary Metrics
+
+http_request_duration_summary_seconds
+
+http_request_duration_summary_seconds{quantile="0.95"}
+

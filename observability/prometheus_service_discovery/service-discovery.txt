@@ -1,4 +1,6 @@
-/etc/prometheus/nodes.json
+Service discovery in Prometheus automatically identifies and scrapes metrics from dynamic sources, such as cloud services or containerized environments. Relabeling is a key feature of service discovery, enabling the transformation of target labels (e.g., renaming or adding labels) to align with specific monitoring and querying requirements.
+
+sudo vim /etc/prometheus/nodes.json
 
 [
   {

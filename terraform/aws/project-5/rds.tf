@@ -1,7 +1,3 @@
-provider "aws" {
-    region = "us-east-1"
-} 
-
 resource "aws_vpc" "db_vpc" {
     cidr_block = "192.168.0.0/16"
     enable_dns_support = true 
@@ -288,4 +284,8 @@ resource "aws_instance" "bastion" {
 
 output "bastion_public_ip" {
     value = aws_instance.bastion.public_ip
+}
+
+output "security_group_ids" {
+    value = aws_security_group.rds_sg.id
 }

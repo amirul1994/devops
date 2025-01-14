@@ -1,0 +1,1 @@
+This project demonstrates various Kubernetes features such as rolling updates, rollbacks, commands and arguments, environment variables, ConfigMaps, multi-container pods, and init containers.

@@ -1,0 +1,22 @@
+- name: manage cron jobs
+  hosts: servers
+  become: Yes 
+  tasks:
+    - name: ensure backup script exists
+      copy:
+        dest: /usr/local/bin/backup_web_data.sh
+        content: |
+          #!/bin/bash
+          cp -r /var/www/html /mnt/backup
+        mode: '0755'
+    
+    - name: add a cron job 
+      cron:
+        name: "web data backup script"
+        job: "/usr/local/bin/backup.sh"
+        minute: "0"
+        hour: "10"
+        day: "28"
+        month: "*"
+        weekday: "6"
+        state: present

@@ -1,0 +1,11 @@
+---
+- name: copy script if not present
+  gather_facts: yes
+  hosts: web2
+  vars:
+    remote_dest: /usr/local/bin/report_status.sh
+  tasks:
+    - copy:
+        src: report_status.sh
+        dest: "{{remote_dest}}"
+      when: copy_file_only_if is defined and copy_file_only_if|bool

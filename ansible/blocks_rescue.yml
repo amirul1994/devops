@@ -1,0 +1,16 @@
+---
+- hosts: all
+  tasks:
+    - name: Install and configure httpd web server
+      when: ansible_facts['distribution'] == 'Ubuntu'
+      block:
+        - apt:
+            name: apache2
+            state: present
+        - service:
+            name: apache2
+            state: started
+      rescue:
+        - debug:
+            msg: "Playbook has failed for {{ inventory_hostname }} node" 
+

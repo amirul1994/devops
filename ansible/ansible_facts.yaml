@@ -1,0 +1,8 @@
+name: gathering facts
+hosts: web1
+become: Yes
+gather_facts: Yes
+tasks:
+  - name: gathering facts
+    debug:
+      var: ansible_facts

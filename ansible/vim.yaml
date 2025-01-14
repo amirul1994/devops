@@ -1,0 +1,9 @@
+- name: Install vim
+  hosts: webservers
+  become: yes
+  tasks:
+  - name: Install vim 
+    yum:
+      name: vim
+      state: present
+    when: ansible_os_family == "RedHat"

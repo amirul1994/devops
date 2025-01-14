@@ -1,0 +1,21 @@
+---
+- name: Install httpd
+  hosts: web1
+  gather_facts: no
+  tasks:
+    - name: Install httpd
+      yum:
+        name: httpd
+        state: present
+
+    - name: Do not remove this task
+      command: /bin/false
+      register: results
+      ignore_errors: yes
+
+    - shell: "echo {{ results.msg }} > /tmp/output"
+    
+    - name: start service
+      service:
+        name: httpd
+        state: started

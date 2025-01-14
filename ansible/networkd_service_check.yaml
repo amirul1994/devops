@@ -1,0 +1,17 @@
+- name: netplan service check
+  hosts: servers
+  become: Yes
+  tasks:
+    - name: netplan service check on ubuntu
+      service:
+        name: systemd-networkd
+        state: started
+        enabled: yes
+      when: ansible_os_family == "Debian" 
+
+    - name: netplan service check on centos
+      service:
+        name: systemd-networkd
+        state: started
+        enabled: yes
+      when: ansible_os_family == "RedHat"

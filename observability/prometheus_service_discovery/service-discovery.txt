@@ -1,0 +1,159 @@
+Service discovery in Prometheus automatically identifies and scrapes metrics from dynamic sources, such as cloud services or containerized environments. Relabeling is a key feature of service discovery, enabling the transformation of target labels (e.g., renaming or adding labels) to align with specific monitoring and querying requirements.
+
+sudo vim /etc/prometheus/nodes.json
+
+[
+  {
+    "labels": {
+      "instance": "node1",
+      "job": "node_exporter",
+      "region": "us-west",
+      "environment": "production",
+      "size": "large",
+      "team": "backend",
+      "type": "database"
+    },
+    "targets": ["localhost:9100"]
+  },
+  {
+    "labels": {
+      "instance": "node3",
+      "job": "node_exporter",
+      "region": "us-central",
+      "environment": "development",
+      "size": "small",
+      "team": "devops",
+      "type": "cache"
+    },
+    "targets": ["localhost:9300"]
+  },
+  {
+    "labels": {
+      "instance": "node4",
+      "job": "node_exporter",
+      "region": "eu-west",
+      "environment": "production",
+      "size": "large",
+      "team": "data-science",
+      "type": "analytics"
+    },
+    "targets": ["localhost:9400"]
+  },
+  {
+    "labels": {
+      "instance": "node5",
+      "job": "node_exporter",
+      "region": "ap-south",
+      "environment": "staging",
+      "size": "medium",
+      "team": "security",
+      "type": "firewall"
+    },
+    "targets": ["localhost:9500"]
+  },
+  {
+    "labels": {
+      "instance": "node6",
+      "job": "node_exporter",
+      "region": "us-west",
+      "environment": "production",
+      "size": "large",
+      "team": "backend",
+      "type": "database"
+    },
+    "targets": ["localhost:9600"]
+  }
+]
+
+
+sudo vim /etc/prometheus/prometheus.yml
+
+scrape_configs:
+  - job_name: 'node_exporter'
+    file_sd_configs:
+      - files:
+         - '/etc/prometheus/nodes.json'
+
+
+sudo vim /etc/prometheus/prometheus.yml
+
+scrape_configs:
+  - job_name: 'node_exporter'
+    file_sd_configs:
+      - files:
+        - '/etc/prometheus/nodes.json'
+    relabel_configs:
+      - source_labels: ['instance']
+        target_label: 'host'
+        regex: '([^/-]+).*'
+
+
+sudo vim /etc/prometheus/prometheus.yml
+
+
+scrape_configs:
+  - job_name: 'node_exporter'
+    file_sd_configs:
+      - files:
+        - '/etc/prometheus/nodes.json'
+    relabel_configs:
+      - source_labels: ['type']
+        regex: 'database|firewall'
+        target_label: 'metric_type'
+        replacement: 'critical'
+
+
+sudo vim /etc/prometheus/prometheus.yml
+
+scrape_configs:
+  - job_name: 'node_exporter'
+    file_sd_configs:
+      - files:
+        - '/etc/prometheus/nodes.json'
+    relabel_configs:
+      - source_labels: ['region', 'environment']
+        target_label: 'region_environment'
+
+
+
+sudo vim /etc/prometheus/prometheus.yml
+
+scrape_configs:
+  - job_name: 'node_exporter'
+    file_sd_configs:
+      - files:
+        - '/etc/prometheus/nodes.json'
+    relabel_configs:
+      - source_labels: ['environment']
+        target_label: 'region'
+        replacement: 'prod-region'
+        regex: 'production'
+
+
+sudo vim /etc/prometheus/prometheus.yml
+
+scrape_configs:
+  - job_name: 'node_exporter'
+    file_sd_configs:
+      - files:
+        - '/etc/prometheus/nodes.json'
+    relabel_configs:
+      - source_labels: ['environment']
+        target_label: 'environment'
+        regex: 'production'
+        action: 'keep'
+
+
+sudo vim /etc/prometheus/prometheus.yml
+
+
+scrape_configs:
+  - job_name: 'node_exporter'
+    file_sd_configs:
+      - files:
+        - '/etc/prometheus/nodes.json'
+    relabel_configs:
+      - source_labels: ['type']
+        target_label: 'type'
+        regex: 'cache'
+        action: 'drop'

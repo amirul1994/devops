@@ -1,0 +1,15 @@
+- name: Install MySQL
+  hosts: servers
+  become: Yes
+  tasks:
+    - name: Install MySQL on Ubuntu
+      apt:
+        name: mysql-server 
+        state: present
+      when: ansible_os_family == "Debian"
+
+    - name: Install MySQL on Debian
+      apt:
+        name: mysql-server
+        state: present
+      when: ansible_os_family == "Debian" 

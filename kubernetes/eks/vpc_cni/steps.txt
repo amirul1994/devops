@@ -1,0 +1,292 @@
+## Create an EKS cluster with the name 'demo-eks' with the following specifications
+Step 1: Clone the Repository
+Clone the required repository:
+
+git clone https://github.com/kodekloudhub/amazon-elastic-kubernetes-service-course.git
+
+Step 2: Navigate to the EKS Directory
+Change into the EKS directory:
+
+cd amazon-elastic-kubernetes-service-course/eks
+
+Step 3: Initialize Terraform
+
+Initialize the Terraform configuration:
+
+terraform init
+
+Step 4: Plan the Terraform Deployment
+
+Run Terraform plan to review the changes that will be applied:
+
+terraform plan
+
+Step 5: Apply the Terraform Configuration
+
+Apply the Terraform configuration to provision the EKS cluster. This step may take up to 10 minutes to complete:
+
+terraform apply
+
+When prompted, type yes to confirm.
+
+Step 6: Retrieve Outputs
+
+After Terraform completes, note the output values for NodeAutoScalingGroup, NodeInstanceRole, and NodeSecurityGroup. You will see something similar to this:
+
+Outputs:
+
+NodeAutoScalingGroup = "demo-eks-stack-NodeGroup-UUJRINMIFPLO"
+NodeInstanceRole = "arn:aws:iam::387779321901:role/demo-eks-node"
+NodeSecurityGroup = "sg-003010e8d8f9f32bd"
+
+Note: Ensure that all resources are created in the us-east-1 region. Make sure to take note of the Terraform outputs, particularly the NodeInstanceRole, as you will need it for the next task.
+
+
+## Set Up Access and Join Nodes on an EKS Cluster
+
+Follow these steps to set up access, create a KUBECONFIG for kubectl, and join worker nodes to your EKS cluster.
+
+Step 1: Create a KUBECONFIG for kubectl
+
+Update the KUBECONFIG to use your EKS cluster:
+
+   aws eks update-kubeconfig --region us-east-1 --name demo-eks
+
+Step 2: Join the Worker Nodes
+
+    1. Download the node authentication ConfigMap: 
+
+   curl -O https://s3.us-west-2.amazonaws.com/amazon-eks/cloudformation/2020-10-29/aws-auth-cm.yaml
+
+    2. Edit the ConfigMap YAML to add the NodeInstanceRole obtained from Terraform: 
+
+   vi aws-auth-cm.yaml
+
+    3. Replace the placeholder text <ARN of instance role (not instance profile)> with the value of NodeInstanceRole from Terraform, then save and exit the editor. The ConfigMap should look like this: 
+
+   apiVersion: v1
+   kind: ConfigMap
+   metadata:
+     name: aws-auth
+     namespace: kube-system
+   data:
+     mapRoles: |
+       - rolearn: <ARN of instance role (not instance profile)> # <- EDIT THIS
+         username: system:node:{{EC2PrivateDNSName}}
+         groups:
+           - system:bootstrappers
+           - system:nodes
+
+Step 3: Apply the Edited ConfigMap
+
+    1. Apply the ConfigMap to join the nodes: 
+
+   kubectl apply -f aws-auth-cm.yaml
+
+    2. Wait for 2-3 minutes for the nodes to join the cluster. 
+
+Step 4: Verify the Nodes
+
+    1. Verify that the nodes have joined the cluster and are in the Ready state: 
+
+   kubectl get nodes -o wide
+
+
+You should see 3 worker nodes in the Ready state. Note that with EKS, you do not see the control plane nodes, as they are managed by AWS.
+
+
+Deploying an Example Pod
+
+Use the following command to create the nginx pod:
+
+cat <<EOF | kubectl apply -f -
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  labels:
+    app: nginx
+spec:
+  containers:
+  - name: nginx
+    image: nginx:latest
+    ports:
+    - containerPort: 80
+EOF
+
+
+Verifying Pod IP Addresses
+
+Verify that the pod IP address comes from the VPC using AWS CLI.
+
+Step 1: Use the following AWS CLI command to get the VPC CIDR range:
+
+aws ec2 describe-vpcs --query 'Vpcs[*].{VpcId:VpcId,CidrBlock:CidrBlock}' --output table
+
+
+Step 2: Describe the pod to get the IP address:
+
+kubectl get pod nginx -o jsonpath='{.status.podIP}'
+
+
+
+Deleting the Pod
+
+Clean up the deployed pod (nginx)
+
+
+
+Changing VPC CNI to Prefix Allocation
+
+Follow the steps below to download, edit, and apply the updated configuration.
+
+Step 1: Download
+
+First, download the aws-k8s-cni.yaml configuration file from the AWS VPC CNI GitHub repository and save it to the /root directory.
+
+curl -o aws-k8s-cni.yaml https://raw.githubusercontent.com/aws/amazon-vpc-cni-k8s/master/config/master/aws-k8s-cni.yaml
+
+Step 2: Edit
+
+Next, edit the downloaded aws-k8s-cni.yaml file to enable prefix assignment.
+    1. Open the aws-k8s-cni.yaml file in a text editor of your choice. 
+
+    2. Locate the environment variable section for ENABLE_PREFIX_DELEGATION. 
+
+    3. Add the following environment variable to enable prefix assignment: 
+
+env:
+
+- name: ENABLE_PREFIX_DELEGATION
+  value: "true"
+
+Ensure the environment variable is added correctly within the container spec section.
+
+    4. Edit amazon-vpc-cni ConfigMap in the same file as above 
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: amazon-vpc-cni
+  namespace: kube-system
+  labels:
+    app.kubernetes.io/name: aws-node
+    app.kubernetes.io/instance: aws-vpc-cni
+    k8s-app: aws-node
+    app.kubernetes.io/version: "v1.18.1"
+data:
+  enable-windows-ipam: "false"
+  enable-network-policy-controller: "true" # Change value from false to true 
+    5. Edit aws-node DaemonSet arg as following: 
+args:
+            - --enable-ipv6=false
+            - --enable-network-policy=true # Change from false to true
+            - --enable-cloudwatch-logs=false
+            - --enable-policy-event-logs=false
+
+Step 3: Apply
+
+Finally, apply the updated configuration to your Kubernetes cluster.
+
+kubectl apply -f /root/aws-k8s-cni.yaml
+
+This command will update the VPC CNI configuration in your cluster to use prefix assignment.
+
+
+## Verifying ENI and Prefix Assignment
+
+
+Step 1: Create a new pod and inspect the node to verify ENI and prefix assignment.
+
+Deploy the pod using the same YAML as in previous lab nginx.
+
+cat <<EOF | kubectl apply -f -
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  labels:
+    app: nginx
+spec:
+  containers:
+  - name: nginx
+    image: nginx:latest
+    ports:
+    - containerPort: 80
+EOF
+
+Step 2: Inspect the node’s ENIs and routes with following commands:
+
+kubectl get nodes
+
+kubectl describe node <node-name>
+
+aws ec2 describe-network-interfaces --query 'NetworkInterfaces[*].{ID:NetworkInterfaceId,PrivateIpAddress:PrivateIpAddress}'
+
+aws ec2 describe-route-tables --query 'RouteTables[*].Routes'
+
+Note: for the 2nd steps, feel free to explore the information on your own using the provided command. We are not validating the results of these commands.
+
+## Network Policies
+
+Step 1: Deploy network policies to manage pod communication.
+
+cat <<EOF | kubectl apply -f -
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny
+  namespace: default
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+EOF
+
+Step 2: Deploy a second pod
+
+cat <<EOF | kubectl apply -f -
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-pod
+  labels:
+    app: test
+spec:
+  containers:
+  - name: busybox
+    image: busybox
+    command: ['sh', '-c', 'echo Hello Kubernetes! && sleep 3600']
+EOF
+
+Step 3: Verify that communication is blocked. 
+
+kubectl exec -it test-pod -- ping <nginx-pod-ip>
+
+
+Network Policies
+
+Step 1: Deploy a network policy that allows communication based on labels.
+
+cat <<EOF | kubectl apply -f -
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-nginx
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      app: nginx
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: test
+EOF
+
+Step 2: Verify that communication between pods is allowed based on the network policy.
+
+Ensure that test-pod can communicate with nginx pod based on the network policy.
+
+kubectl exec -it test-pod -- ping <nginx-pod-ip>

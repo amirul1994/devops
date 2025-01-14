@@ -1,0 +1,213 @@
+Create an EKS cluster with the name 'demo-eks' with the following specifications
+Step 1: Clone the Repository
+
+Clone the required repository:
+
+git clone https://github.com/kodekloudhub/amazon-elastic-kubernetes-service-course.git
+
+Step 2: Navigate to the EKS Directory
+
+Change into the EKS directory:
+
+cd amazon-elastic-kubernetes-service-course/eks
+
+Step 3: Initialize Terraform
+
+Initialize the Terraform configuration:
+
+terraform init
+
+Step 4: Plan the Terraform Deployment
+
+Run Terraform plan to review the changes that will be applied:
+
+terraform plan
+
+Step 5: Apply the Terraform Configuration
+
+Apply the Terraform configuration to provision the EKS cluster. This step may take up to 10 minutes to complete:
+
+terraform apply
+
+When prompted, type yes to confirm.
+Step 6: Retrieve Outputs
+
+After Terraform completes, note the output values for NodeAutoScalingGroup, NodeInstanceRole, and NodeSecurityGroup. You will see something similar to this:
+
+Outputs:
+
+NodeAutoScalingGroup = "demo-eks-stack-NodeGroup-UUJRINMIFPLO"
+NodeInstanceRole = "arn:aws:iam::387779321901:role/demo-eks-node"
+NodeSecurityGroup = "sg-003010e8d8f9f32bd"
+
+Note: Ensure that all resources are created in the us-east-1 region. Make sure to take note of the Terraform outputs, particularly the NodeInstanceRole, as you will need it for the next task.
+
+
+Set Up Access and Join Nodes on an EKS Cluster
+
+Follow these steps to set up access, create a KUBECONFIG for kubectl, and join worker nodes to your EKS cluster.
+Step 1: Create a KUBECONFIG for kubectl
+
+Update the KUBECONFIG to use your EKS cluster:
+
+   aws eks update-kubeconfig --region us-east-1 --name demo-eks
+
+Step 2: Join the Worker Nodes
+
+    Download the node authentication ConfigMap:
+
+   curl -O https://s3.us-west-2.amazonaws.com/amazon-eks/cloudformation/2020-10-29/aws-auth-cm.yaml
+
+    Edit the ConfigMap YAML to add the NodeInstanceRole obtained from Terraform:
+
+   vi aws-auth-cm.yaml
+
+    Replace the placeholder text <ARN of instance role (not instance profile)> with the value of NodeInstanceRole from Terraform, then save and exit the editor. The ConfigMap should look like this:
+
+   apiVersion: v1
+   kind: ConfigMap
+   metadata:
+     name: aws-auth
+     namespace: kube-system
+   data:
+     mapRoles: |
+       - rolearn: <ARN of instance role (not instance profile)> # <- EDIT THIS
+         username: system:node:{{EC2PrivateDNSName}}
+         groups:
+           - system:bootstrappers
+           - system:nodes
+
+Step 3: Apply the Edited ConfigMap
+
+    Apply the ConfigMap to join the nodes:
+
+   kubectl apply -f aws-auth-cm.yaml
+
+    Wait for 2-3 minutes for the nodes to join the cluster.
+
+Step 4: Verify the Nodes
+
+    Verify that the nodes have joined the cluster and are in the Ready state:
+
+   kubectl get nodes -o wide
+
+
+You should see 3 worker nodes in the Ready state. Note that with EKS, you do not see the control plane nodes, as they are managed by AWS.
+
+
+Static Provisioning of Persistent Volume
+
+Create a pod and PersistentVolume (PV) with static provisioning.
+
+Step 1: Create an EBS volume using AWS CLI:
+
+aws ec2 create-volume --size 10 --region us-east-1 --availability-zone us-east-1a --volume-type gp2
+
+Step 2: Get the volume ID from the output and replace in the following YAML
+
+cat <<EOF | kubectl apply -f -
+# Create a PersistentVolume (PV)
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: ebs-pv
+spec:
+  capacity:
+    storage: 10Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: manual
+  csi:
+    driver: ebs.csi.aws.com
+    volumeHandle: <volume-id>
+---
+# Create a PersistentVolumeClaim (PVC)
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ebs-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: manual
+  resources:
+    requests:
+      storage: 10Gi
+---
+# Create a pod using the PVC
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ebs-pod
+spec:
+  containers:
+  - name: app
+    image: busybox
+    command: [ "sh", "-c", "echo Hello Kubernetes! && sleep 3600" ]
+    volumeMounts:
+    - mountPath: "/data"
+      name: ebs-storage
+  volumes:
+  - name: ebs-storage
+    persistentVolumeClaim:
+      claimName: ebs-pvc
+EOF 
+
+
+Create a Default Storage Class
+
+Create a default storage class for dynamic provisioning.
+
+cat <<EOF | kubectl apply -f -
+# Create a StorageClass
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: ebs-sc
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
+provisioner: ebs.csi.aws.com
+parameters:
+  type: gp2
+  fsType: ext4
+EOF
+
+
+Create Pod to Use new Storage Class
+
+Create new PVC to use the default storage class and deploy new pod.
+
+cat <<EOF | kubectl apply -f -
+# PVC
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ebs-pvc-new
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: ebs-sc
+  resources:
+    requests:
+      storage: 10Gi
+---
+# Re-deploy pod
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ebs-pod-new
+spec:
+  containers:
+  - name: app
+    image: busybox
+    command: [ "sh", "-c", "echo Hello Kubernetes! && sleep 3600" ]
+    volumeMounts:
+    - mountPath: "/data"
+      name: ebs-storage
+  volumes:
+  - name: ebs-storage
+    persistentVolumeClaim:
+      claimName: ebs-pvc-new
+EOF

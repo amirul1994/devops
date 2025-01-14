@@ -1,0 +1,47 @@
+# Create a PersistentVolume (PV)
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: ebs-pv
+spec:
+  capacity:
+    storage: 10Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: manual
+  csi:
+    driver: ebs.csi.aws.com
+    volumeHandle: <volume-id>
+---
+# Create a PersistentVolumeClaim (PVC)
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ebs-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: manual
+  resources:
+    requests:
+      storage: 10Gi
+---
+# Create a pod using the PVC
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ebs-pod
+spec:
+  containers:
+  - name: app
+    image: busybox
+    command: [ "sh", "-c", "echo Hello Kubernetes! && sleep 3600" ]
+    volumeMounts:
+    - mountPath: "/data"
+      name: ebs-storage
+  volumes:
+  - name: ebs-storage
+    persistentVolumeClaim:
+      claimName: ebs-pvc

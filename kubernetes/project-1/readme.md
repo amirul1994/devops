@@ -1,0 +1,1 @@
+It is a Kubernetes project that covers Pods, ReplicaSets, Deployments, Cluster IP, NodePort, and Namespaces.

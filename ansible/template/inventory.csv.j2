@@ -1,0 +1,4 @@
+hostname, architecture, distribution_version, mem_total_mb, processor_cores, processor_count
+{% for host in groups['web'] %}
+{{ host }}, {{ hostvars[host]['ansible_architecture'] }}, {{ hostvars[host]['ansible_distribution_version'] }}, {{ hostvars[host]['ansible_memtotal_mb'] }}, {{ hostvars[host]['ansible_processor_cores'] }}, {{ hostvars[host]['ansible_processor_count'] }}
+{% endfor %}

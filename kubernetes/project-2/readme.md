@@ -1,0 +1,2 @@
+This project demonstrates advanced Kubernetes concepts such as labels and selectors, taints and tolerations, node selectors, node affinity, resource limits, DaemonSets, and static pods. The goal is
+to create a Kubernetes cluster that efficiently schedules and manages resources for different types of workloads.

@@ -1,0 +1,10 @@
+- name: Compress multiple files
+  hosts: web1
+  tasks:
+  - archive:
+     path: 
+      - /root/file1.txt
+      - /usr/local/share/file2.txt
+      - /var/log/lastlog
+     dest: /root/files.tar.bz2
+     format: bz2

@@ -1,0 +1,7 @@
+# generate-agent-info.yml
+---
+- hosts: monitoring_server
+  tasks:
+    - template:
+         src: agents.conf.j2
+         dest: /etc/monitor/agents.conf

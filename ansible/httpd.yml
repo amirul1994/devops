@@ -1,0 +1,9 @@
+---
+- name: replace port 80 to 8080
+  hosts: web1
+  tasks:
+  - replace: 
+      path: /etc/httpd/conf/httpd.conf
+      regexp: '^(Listen)\s+80\s*$'
+      replace: 'Listen 8080'
+  - service: name=httpd state=restarted

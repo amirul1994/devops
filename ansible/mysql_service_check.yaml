@@ -1,0 +1,15 @@
+- name: mysql service check
+  hosts: servers
+  become: Yes
+  tasks:
+    - name: mysql service check on ubuntu 
+      service:
+        name: mysql
+        state: started 
+      when: ansible_os_family == "Debian" 
+    
+    - name: mysql service on centos 
+      service:
+        name: mysql
+        state: started
+      when: ansible_os_family == "RedHat"

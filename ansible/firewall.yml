@@ -1,0 +1,5 @@
+---
+- hosts: web1
+  tasks:
+   - yum: name=firewalld state=installed
+   - service: name=firewalld state=started

@@ -1,0 +1,21 @@
+- name: directory & file creation
+  hosts: servers
+  become: Yes
+  tasks:
+    - name: directory creation 
+      file:
+        path: /root/dir2
+        state: directory 
+        owner: root 
+        group: root 
+        mode: '0744'
+
+    - name: file creation
+      copy:
+        dest: /root/dir2/file2
+        content: |
+          my name is amirul
+          unemployed 
+        owner: root 
+        group: root
+        mode: '0765' 

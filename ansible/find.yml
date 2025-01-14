@@ -1,0 +1,14 @@
+---
+- hosts: web1
+  tasks:
+    - name: Find files
+      find:
+        paths: /opt/data
+        age: 2m
+        size: 1m
+        recurse: yes
+      register: file
+
+    - name: Copy files
+      command: "cp {{ item.path }} /opt"
+      with_items: "{{ file.files }}"

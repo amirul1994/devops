@@ -1,0 +1,7 @@
+ssh-keygen -f /home/thor/.ssh/maria
+
+ssh-keygen -f /home/thor/.ssh/john
+
+ssh-copy-id -i /home/thor/.ssh/maria  maria@lamp-db
+
+ssh-copy-id -i /home/thor/.ssh/john  john@lamp-web

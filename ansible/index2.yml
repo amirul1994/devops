@@ -1,0 +1,12 @@
+---
+- name: Add block to index.html
+  hosts: web1
+  tasks:
+    - blockinfile:
+       owner: apache
+       group: apache
+       insertbefore: BOF
+       path: /var/www/html/index.html
+       block: |
+        Welcome to KodeKloud!
+        This is Ansible Lab.

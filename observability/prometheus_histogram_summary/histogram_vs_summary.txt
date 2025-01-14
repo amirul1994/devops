@@ -1,0 +1,17 @@
+##Histograms
+
+Buckets: Observations are grouped into predefined intervals, allowing analysis of data distribution.
+Aggregatable: Histograms can be aggregated across multiple instances, making them ideal for distributed systems.
+Use Cases: Request durations, response sizes.
+
+##Summaries
+
+Quantiles: Summaries calculate percentiles based on individual instance observations.
+Instance-Specific: Better suited for single-instance scenarios, as summaries cannot be aggregated across instances.
+Use Cases: Memory usage, application-specific metrics.
+
+##Key Differences:
+
+Aggregation: Histograms aggregate across instances, while summaries are instance-specific.
+Configuration: Histograms use buckets; summaries use quantiles.
+Resource Usage: Summaries require more memory and CPU to maintain precise quantiles.

@@ -1,0 +1,203 @@
+{
+  "name": "Bond"
+}
+
+The name is {{ name }}
+
+The name is Bond
+
+{
+  "name": "Bond"
+}
+
+The name is {{ name | upper }}
+
+The name is BOND
+
+{
+  "book_name": "Title of books are usually title cased"
+}
+
+{{ book_name | title }}
+
+Title Of Books Are Usually Title Cased
+
+{
+  "dialogue": "The name is Bourne, James Bourne!"
+}
+
+{{ dialogue | replace('Bourne', 'Bond') }}
+
+The name is Bond, James Bond!
+
+{
+  "numbers": [
+    13,
+    32,
+    53,
+    34,
+    25,
+    76,
+    17
+  ]
+}
+
+{{ numbers | max }}
+
+76
+
+
+{
+  "numbers": [
+    13,
+    32,
+    53,
+    34,
+    25,
+    76,
+    17
+  ]
+}
+
+{{ numbers | last }}
+
+17
+
+{
+  "words": [
+    "we",
+    "are",
+    "meant",
+    "to",
+    "be",
+    "together"
+  ]
+}
+
+{{ words | join(' ') }}
+
+we are meant to be together
+
+{
+  "words": [
+    "we",
+    "are",
+    "meant",
+    "to",
+    "be",
+    "together"
+  ]
+}
+
+{{ words | join(' ') | title }}
+
+We Are Meant To Be Together
+
+{
+  "words": "Everyone was busy, so I went to the movie alone. I was very proud of my nickname throughout high school but today- I couldn’t be any different to what my nickname was. Wow, does that work? She works two jobs to make ends meet; at least, that was her reason for not having time to join us."
+}
+
+{{ words | wordcount }}
+
+58
+
+{
+  "names": [
+    "Alpha",
+    "Beta",
+    "Charlie",
+    "Delta",
+    "Echo"
+  ]
+}
+
+{% for name in names -%}
+{{ name }}
+{% endfor %}
+
+Alpha
+Beta
+Charlie
+Delta
+Echo
+
+{
+  "name_servers": [
+    "10.1.1.5",
+    "10.1.1.6",
+    "10.1.1.8",
+    "10.8.8.1",
+    "8.8.8.8"
+  ]
+}
+
+{% for name_server in name_servers -%}
+nameserver {{ name_server }}
+{% endfor %}
+
+nameserver 10.1.1.5
+nameserver 10.1.1.6
+nameserver 10.1.1.8
+nameserver 10.8.8.1
+nameserver 8.8.8.8
+
+{
+  "hosts": [
+    {
+      "name": "web1",
+      "ip_address": "192.168.5.4"
+    },
+    {
+      "name": "web2",
+      "ip_address": "192.168.5.5"
+    },
+    {
+      "name": "web3",
+      "ip_address": "192.168.5.8"
+    },
+    {
+      "name": "db1",
+      "ip_address": "192.168.5.9"
+    }
+  ]
+}
+
+{% for host in hosts -%}
+{{ host.name }} {{ host.ip_address}}
+{% endfor %}
+
+web1 192.168.5.4
+web2 192.168.5.5
+web3 192.168.5.8
+db1 192.168.5.9
+
+{
+  "hosts": [
+    {
+      "name": "web1",
+      "ip_address": "192.168.5.4"
+    },
+    {
+      "name": "web2",
+      "ip_address": "192.168.5.5"
+    },
+    {
+      "name": "web3",
+      "ip_address": "192.168.5.8"
+    },
+    {
+      "name": "db1",
+      "ip_address": "192.168.5.9"
+    }
+  ]
+}
+
+{% for host in hosts -%}
+  {% if "web" in host.name -%}
+{{ host.name }} {{ host.ip_address -}}
+  {% endif %}
+{% endfor %}
+
+web1 192.168.5.4
+web2 192.168.5.5
+web3 192.168.5.8

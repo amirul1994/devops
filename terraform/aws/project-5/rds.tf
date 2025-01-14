@@ -203,6 +203,11 @@ variable "rds_passwd" {
     sensitive = true
 }
 
+# data "aws_secretsmanager_secret_version" "rds_password" {
+#     secret_id = aws_secretsmanager_secret.rds_secret.id
+#     depends_on = [aws_secretsmanager_secret_version.rds_secret_version]
+# }
+
 resource "aws_db_instance" "mysql_rds" {
     identifier = "amir-db"
     engine = "mysql"
@@ -212,6 +217,7 @@ resource "aws_db_instance" "mysql_rds" {
     storage_type = "gp2"
     engine_version = "8.0.32"
     username = "admin"
+    # password = jsondecode(data.aws_secretsmanager_secret_version.rds_password.secret_string)["password"]
     password = var.rds_passwd
     
     db_subnet_group_name = aws_db_subnet_group.rds_sbnt_grp.name
@@ -221,6 +227,11 @@ resource "aws_db_instance" "mysql_rds" {
     backup_retention_period = 1 
 
     vpc_security_group_ids = [aws_security_group.rds_sg.id] 
+
+    enabled_cloudwatch_logs_exports = ["error", "general", "slowquery"]
+    apply_immediately = true
+
+    iam_database_authentication_enabled = true
 
     lifecycle {
         create_before_destroy = true
@@ -282,10 +293,23 @@ resource "aws_instance" "bastion" {
     }
 } 
 
+resource "aws_sns_topic" "alarm_notifications" {
+    name = "RDSAlarmNotifications"
+} 
+
+resource "aws_sns_topic_subscription" "email_subscription" {
+    topic_arn = aws_sns_topic.alarm_notifications.arn
+    protocol = "email"
+    endpoint = "sample@example.com"
+}
+
 output "bastion_public_ip" {
     value = aws_instance.bastion.public_ip
 }
+<<<<<<< HEAD
 
 output "security_group_ids" {
     value = aws_security_group.rds_sg.id
 }
+=======
+>>>>>>> 700ed33d3d7b574a72a29b2e53d03800caf5923b

@@ -1,0 +1,73 @@
+> ceil(10.3)
+11
+> floor(10.9)
+10
+> max(5, 10, 15)
+15
+> min(5, 10, 15)
+5
+
+> split(",", "file1,file2,file3")
+tolist([
+  "file1",
+  "file2",
+  "file3",
+]) 
+
+> join("-", ["example", "files", "created"])
+"example-files-created"
+> lower("HELLO")
+"hello"
+> upper("hello")
+"HELLO"
+> 
+
+> length([1, 2, 3, 4])
+4
+> 
+
+> contains(["a", "b", "c"], "b")
+true
+> 
+
+> keys(var.file_contents)
+tolist([
+  "file1",
+  "file2",
+  "file3",
+])
+> 
+
+> values(var.file_contents)
+tolist([
+  "This is content for file1.",
+  "This is content for file2.",
+  "This is content for file3.",
+])
+> 
+
+> lookup(var.file_contents, "file1", "Default content")
+"This is content for file1."
+
+
+> merge({"a" = 1}, {"b" = 2})
+{
+  "a" = 1
+  "b" = 2
+}
+> 
+
+> zipmap(["a", "b", "c"], [1, 2, 3])
+{
+  "a" = 1
+  "b" = 2
+  "c" = 3
+}
+
+coalesce(var.file_contents)
+tomap({
+  "file1" = "This is content for file1."
+  "file2" = "This is content for file2."
+  "file3" = "This is content for file3."
+}) 
+

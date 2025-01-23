@@ -1,0 +1,69 @@
+PUT /library
+{
+  "mappings": {
+    "properties": {
+      "title": {
+        "type": "text"
+      },
+      "author": {
+        "type": "text"
+      },
+      "publication_year": {
+        "type":"integer"
+      }
+    }
+  }
+}
+
+
+POST /library/_doc
+{
+  "title": "The Great Gatsby",
+  "author": "F. Scott Fitzerald",
+  "publication_year": 1924
+} 
+
+POST /library/_doc
+{
+  "title": "To Kill a Mockingbird",
+  "author": "Harper Lee",
+  "publication_year": 1960
+}
+
+GET /library/_search
+
+PUT /library/_doc/1001
+{
+  "title": "1984",
+  "author": "George Orwell",
+  "publication_year": 1949
+}
+
+GET /library/_search
+{
+  "query": {
+    "match": {
+      "title": "The Great Gatsby"
+    }
+  }
+}
+
+POST /library/_update/Y2wik5QBPqk_A_aOutBV
+{
+  "doc": {
+    "publication_year": 1925
+  }
+}
+
+GET /library/_search
+{
+  "query": {
+    "match": {
+      "title": "1984"
+    }
+  }
+}
+
+GET /library/_search
+
+DELETE library/_doc/ZWwlk5QBPqk_A_aOo9Ag

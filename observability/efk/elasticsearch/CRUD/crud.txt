@@ -35,3 +35,32 @@ kubectl get svc elasticsearch -n efk -o jsonpath='{.spec.clusterIP}' | xargs -I 
 kubectl get svc elasticsearch -n efk -o jsonpath='{.spec.clusterIP}' | xargs -I {} curl -X DELETE "http://{}:9200/gadgets/_doc/1002"
 
 history | grep "^ *[0-9]* *kubectl get svc" | grep -v "awk" | awk '{$1=""; print $0}' | sed 's/^ *//'
+
+PUT /school
+
+PUT /school/_doc/1
+{
+  "name": "Alice",
+  "grade": 12,
+  "subject": "Mathematics"
+} 
+
+POST /school/_doc
+{
+  "name": "Bob",
+  "grade": 10,
+  "subject": "History"
+}
+
+POST /school/_update/1
+{
+  "doc": {
+    "grade": 11
+  }
+}
+
+GET /school/_doc/1
+
+DELETE school/_doc/1
+
+

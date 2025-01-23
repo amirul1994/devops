@@ -1,0 +1,37 @@
+kubectl get svc elasticsearch -n efk -o jsonpath='{.spec.clusterIP}' | xargs -I {} curl -X GET "http://{}:9200/_cluster/health?pretty"
+
+kubectl get svc elasticsearch -n efk -o jsonpath='{.spec.clusterIP}' | xargs -I {} curl -X PUT "http://{}:9200/gadgets" -H 'Content-Type: application/json' -d '{
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 1
+  },
+  "mappings": {
+    "properties": {
+      "gadget_id": { "type": "integer" },
+      "name": { "type": "text" },
+      "description": { "type": "text" },
+      "price": { "type": "float" },
+      "category": { "type": "keyword" }
+    }
+  }
+}'
+
+kubectl get svc elasticsearch -n efk -o jsonpath='{.spec.clusterIP}' | xargs -I {} curl -X POST "http://{}:9200/gadgets/_doc/1001" -H 'Content-Type: application/json' -d '{
+  "gadget_id": 1001,
+  "name": "Smartphone Pro Max",
+  "description": "Latest high-end smartphone with advanced camera features and long-lasting battery.",
+  "price": 999.99,
+  "category": "Electronics"
+}'
+
+kubectl get svc elasticsearch -n efk -o jsonpath='{.spec.clusterIP}' | xargs -I {} curl -X POST "http://{}:9200/gadgets/_doc/1002" -H 'Content-Type: application/json' -d '{
+  "gadget_id": 1002,
+  "name": "Wireless Earbuds",
+  "description": "Noise-cancelling wireless earbuds with 24-hour battery life.",
+  "price": 199.99,
+  "category": "Accessories"
+}'
+
+kubectl get svc elasticsearch -n efk -o jsonpath='{.spec.clusterIP}' | xargs -I {} curl -X DELETE "http://{}:9200/gadgets/_doc/1002"
+
+history | grep "^ *[0-9]* *kubectl get svc" | grep -v "awk" | awk '{$1=""; print $0}' | sed 's/^ *//'

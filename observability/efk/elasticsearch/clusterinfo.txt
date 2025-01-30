@@ -1,0 +1,178 @@
+Using the dev tools utility of Kibana, create a new index called products.
+
+The index should have the following settings:
+
+Number of primary shards: 1
+Number of replica shards: 1
+And it should have the following attribute-mappings:
+
+product_id: integer
+name: text
+description: text
+type: float
+category: keyword
+brand: keyword
+
+Navigate to the Dev Tools utility under Management section in the Kibana UI.
+
+Enter the following PUT request in the console on the left:
+
+PUT /products
+{
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 1
+  },
+  "mappings": {
+    "properties": {
+      "product_id": {
+        "type": "integer"
+      },
+      "name": {
+        "type": "text"
+      },
+      "description": {
+        "type": "text"
+      },
+      "price": {
+        "type": "float"
+      },
+      "category": {
+        "type": "keyword"
+      },
+      "brand": {
+        "type": "keyword"
+      }
+    }
+  }
+}
+Click on the small play button on the top right of this console prompt.
+
+You should see an acknowledgement on the right prompt that the index has been created.
+
+
+Now, add a new product to the index products. The document should have the following entries:
+
+product_id: 67890
+name: Cozy Winter Sweater
+description: Soft and stylish sweater for cold days
+price: 59.99
+category: Apparel
+brand: Trendy Threads
+
+Now, enter and run the following request in the Dev Tools console:
+
+POST /products/_doc/1
+{
+  "product_id": 67890,
+  "name": "Cozy Winter Sweater",
+  "description": "Soft and stylish sweater for cold days",
+  "price": 59.99,
+  "category": "Apparel",
+  "brand": "Trendy Threads"
+}
+
+Now that an index has been created and an entry added to it, you can send the following request through the console to retrieve data:
+
+GET /products/_doc/1
+
+Here, _doc refers to document type and 1 is the ID of the document. When you perform operations such as getting, indexing, or updating a document, you use the _doc endpoint to interact with the specific document.
+
+There are various API endpoints available to retrieve information about the elasticsearch cluster.
+
+Cluster Health
+
+GET /_cluster/health
+
+Provides an overview of cluster status (green, yellow, red)
+and information on nodes, shards, relocation, etc.
+
+Cluster Stats:
+
+GET /_cluster/stats
+
+
+Provides detailed metrics on nodes, indices, shards, disk usage, etc.
+
+Cluster Settings:
+
+GET /_cluster/settings
+
+Helps view current cluster-wide configuration settings
+
+What is the name of the elasticsearch cluster?
+
+Use the following request on the Dev Tools console to find out:
+
+GET /_cluster/health
+
+What is the current status of the cluster?
+
+Use the following request on the Dev Tools console and analyze the status parameter:
+
+GET /_cluster/health
+
+Are there any transient or persistent settings configured for our cluster?
+
+Use the following API to get the answer:
+
+GET /_cluster/settings
+
+Analogous to cluster information is the index information which you can get using APIs similar to the ones used for the cluster.
+
+List Indices
+
+GET /_cat/indices
+
+Displays a list of all indices, their health, number of documents, size, etc.
+
+Index Settings
+
+GET /<index_name>/_settings
+
+Used for viewing mappings, analysis settings, and other configurations for a specific index
+
+Index Stats
+
+GET /<index_name>/_stats
+
+Provides detailed stats about an index (search stats, indexing stats, store size, etc.)
+
+What is the tier preference for the products index?
+
+Use the following API call:
+
+GET /products/_settings
+
+What is the status of the products index?
+
+Analyze the status of the indices section of the following API call's output:
+
+GET /products/_stats
+
+There are two types of cluster settings - transient and persistent.
+
+Transient Settings
+These settings can be changed dynamically using the Cluster Update Settings API. Examples include things like the number of replicas for an index or routing allocation rules.
+
+Persistent Settings
+These settings require a cluster restart to take effect. Examples include cluster name, data path location, and certain network settings.
+
+Let's update a transient setting now. We configured only 1 replica for our products index. Change it to 2.
+
+Execute the following API PUT request:
+
+PUT /products/_settings
+{ 
+  "index.number_of_replicas": 2 
+}
+
+There are some important considerations for cluster and index settings:
+
+Not all settings are dynamic. Many cluster-wide settings are persistent. You can't update these the same way you would update a document.
+You can use GET /_cluster/settings to see current settings as you saw earlier.
+Be aware that changing persistent settings requires a full cluster restart for the change to take effect.
+There are some caveats with the updation of settings as well. While cluster settings update resembles the Update concept of CRUD, be mindful of the following:
+
+You don't directly create or delete cluster-wide settings using the typical REST verbs. Instead, you modify existing settings or provide cluster-wide configurations at the time of cluster creation.
+CRUD mainly works on data within an index, while cluster settings impact the overall cluster behavior.

@@ -1,0 +1,103 @@
+There are various API endpoints available to retrieve information about the elasticsearch cluster and specific indices as well. We have reproduced here the concepts introduced to you in the previous lab for your perusal:
+
+Cluster Health
+
+GET /_cluster/health
+
+Provides an overview of cluster status (green, yellow, red) and information on nodes, shards, relocation, etc.
+
+Cluster Stats:
+
+GET /_cluster/stats
+
+Provides detailed metrics on nodes, indices, shards, disk usage, etc.
+
+Cluster Settings:
+
+GET /_cluster/settings
+
+Helps view current cluster-wide configuration settings
+
+*List Indices
+
+GET /_cat/indices
+
+Displays a list of all indices, their health, number of documents, size, etc.
+
+Index Settings
+
+GET /<index_name>/_settings
+
+Used for viewing mappings, analysis settings, and other configurations for a specific index
+
+Index Stats
+
+GET /<index_name>/_stats
+
+Provides detailed stats about an index (search stats, indexing stats, store size, etc)
+
+What is the current status of the elasticsearch cluster docker-cluster?
+
+Use the following request on the Dev Tools console and analyze the status parameter:
+
+GET /_cluster/health
+
+What is the number of data nodes for the docker-cluster?
+
+Use the following request on the Dev Tools console and analyze the number_of_data_nodes parameter:
+
+GET /_cluster/health
+
+What is the packaging type of the cluster node?
+
+Use the following API and look at the packaging_types section:
+
+GET /_cluster/stats
+
+What is the current number of snapshots for the cluster?
+
+Use the following API and look at the snapshots section at the end of the response:
+
+GET /_cluster/stats
+
+What is the number of persistent and transient settings for the docker-cluster?
+
+Use the following request on the Dev Tools console and analyze the output:
+
+GET /_cluster/settings
+
+What is the node id for the node in docker-cluster?
+
+Use the following request on the Dev Tools console and analyze the node_allocation_decisions section in the output:
+
+GET _cluster/allocation/explain
+
+We have created a new index. What is its name?
+
+Analyze the output of the following request:
+
+GET _cat/indices
+
+What is the product id and name for the only entry in the product index?
+
+Analyze the output of the following request:
+
+GET product/_doc/1
+
+Is the product index a managed index?
+
+Check out the output of this API request:
+
+GET product/_ilm/explain
+
+What is the tier preference for the product index?
+
+Check out the settings of the product index using the following API request:
+
+GET product/_settings
+
+What is the number of docs in the product index now?
+
+Check the total->docs section from the output of this request:
+
+GET product/_stats

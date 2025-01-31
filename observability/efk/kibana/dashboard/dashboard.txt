@@ -1,0 +1,115 @@
+Open the menu on the left sidebar on the kibana dashboard.
+
+Under Analytics, click on Machine Learning. The Data Visualizer page opens up.
+
+Click on Select file under Visualize data from a file and select the CSV file that you have already downloaded.
+
+You shall see an analysis of the file under Summary. Click on the Import button and enter commerce_activity for index name under simple header.
+
+Keep the Create data view option checked and click on Import.
+
+Now that the index has been created, you should see multiple options at the bottom of the page. Click on the option to View index in Discover.
+
+Alternatively, you can use the menu on the left-sidebar to navigate to Discover under Analytics.
+
+The commerce_activity index should be selected here by default and the logs should be displayed. You can see how kibana was able to determine the fields for the data.
+
+Analyze this data and answer the questions in the subsequent tasks.
+
+What was the login attempt failure in percentage terms?
+
+In the Discover tab, click on event_type under Available fields.
+
+You should now see a brief prompt that displays an overview of the percentages of all event types.
+
+Look for the percentage value of login_failure here.
+
+Alternatively, go to Machine Learning -> Data view and click on commerce_activity index. Expand the login_failure field here and look at the percentage of login_failure event type.
+
+We will now create our dashboard. Create a panel for our dashboard with the following specs:
+
+Data Source: commerce_activity
+Visualization Type: Donut
+Metric: Count of records
+Slice By: Top 7 values of event_type
+
+Give this panel the title Spread of Events and save it to a new dashboard called Ecommerce Dashboard.
+
+Click on Dashboards under Analytics from the menu on the left sidebar.
+
+Click on Create a dashboard -> Create visualization.
+
+Drag and drop event_type field from the list under Available fields to the central area which says Drop some fields here to start.
+
+You should see a bar graph created from the data. Change the Visualization type to Donut using the drop-down box.
+
+Under Slice by, you should see Top 5 values of event_type pre-selected. Click on it and change the Number of values to 7. You should also see Count of records pre-selected under Metric.
+
+Click on Save on the top right of the page and enter Spread of Events for Title in the prompt. Under Add to dashboard, select New and click on Save and go to Dashboard.
+
+Now, you should see your panel on the dashboard. Click on Save on the top right of the page to display the Save dashboard prompt.
+
+Enter Ecommerce Dashboard for dashboard name and click on Save.
+
+What was the main reason for login_failure attempts?
+
+Navigate to the Discover tab from the menu and locate the event_type field under Available Fields.
+
+Click on the event_type field, find the value login_failure, and click the "+" sign next to it to apply a filter for login failure events.
+With the filter applied, locate the reason field under Available Fields.
+
+Click on the reason field to display an overview of the values and percentages for reasons specifically filtered by login_failure.
+Identify the reason with the highest percentage from this filtered view. This reason will represent the primary cause of login failures.
+
+Optional
+For a broader analysis, you can navigate to Machine Learning -> Data Views and select the commerce_activity index.
+
+Expand the reason field here and analyze its values after applying the login_failure filter to ensure consistency with the Discover tab results.
+
+Now, add a new panel in the Ecommerce Dashboard with the following specs:
+
+Title: Distribution of failed login attempts
+Data Source: commerce_activity
+Visualization Type: Bar horizontal
+Horizontal Axis: Count of records
+Vertical Axis: Top 5 values of reason
+
+What was the unique number of products on 2024-04-01?
+
+Navigate to the Discover tab from the menu and click on product_id under Available fields.
+
+You should now see a brief prompt that displays an overview of the percentages of all event types. Here, switch to the Distribution tab and click on Visualize at the bottom.
+
+You will see a visualization page and query bar now. By default, the visualization type would be Bar vertical stacked. Enter the following query and click on Update:
+
+timestamp >= "2024-04-01" and timestamp < "2024-04-02"
+On the right hand side, under Vertical axis, select Unique count of product_id.
+
+You should have the answer as 2.
+
+Now, we will add another panel in the Ecommerce Dashboard with the following specs:
+
+Title: Top 2 Product Interactions on 2024-04-01
+Data Source: commerce_activity
+Visualization Type: Bar horizontal
+Horizontal Axis: Count of records
+Vertical Axis: Top 2 values of product_id
+
+Note: Exclude rows where product_id is null.
+
+Click on Dashboards under Analytics from the menu on the left sidebar and click on Ecommerce Dashboard.
+
+Click on the Create visualization button here.
+
+Drag and drop product_id field from the list under Available fields to the central area which says Drop some fields here to start.
+
+You should see a bar graph created from the data.
+
+Now, change the Visualization type to Bar horizontal using the drop-down box. Enter the following query within the KQL box and click on Update:
+
+product_id : * and timestamp >= "2024-04-01" and timestamp < "2024-04-02"
+Select Count of records for Horizontal Axis and Top 2 values of product_id for Vertical Axis.
+
+Click on Save and Return on the top right of the page. Click on [No Title] on the top of your new panel and enter Top 2 Product Interactions on 2024-04-01 for Title in the prompt and click on Apply.
+
+Now, you should see your panel on the dashboard. Click on Save on the top right of the page.

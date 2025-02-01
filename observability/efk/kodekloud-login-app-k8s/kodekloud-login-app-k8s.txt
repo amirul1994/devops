@@ -1,0 +1,85 @@
+The EFK stack may take 3-5 minutes to fully load. To verify that all components are up and running, execute the following command:
+
+kubectl get pods -n efk
+
+Ensure that all pods are in the "Running" state before proceeding with the labs. This will ensure the environment is ready for you to start learning and interacting with the EFK stack.
+
+
+Which component of the EFK stack is responsible for collecting and forwarding logs to Elasticsearch?
+
+Answer: Fluent Bit
+
+In Kibana, which feature allows you to create visualizations and dashboards based on your data?
+
+Answer: Visualize
+
+Which of the following commands checks the health status of an Elasticsearch cluster?
+
+curl -X GET "http://<ClusterIP>:9200/_cluster/health?pretty"
+
+Setting Up the Environment
+Objective: Ensure the student is able to interact with the Kubernetes cluster and access Elasticsearch.
+
+Access the Kubernetes Cluster:
+
+Use kubectl commands to verify access to the Kubernetes cluster.
+Run: kubectl get nodes to ensure the cluster is up and running.
+Get the ClusterIP of Elasticsearch Service:
+
+Run: kubectl get svc -n efk to get the ClusterIP of the Elasticsearch service.
+Verify Elasticsearch Access:
+
+Use curl to check the health of the Elasticsearch cluster.
+kubectl get svc elasticsearch -n efk -o jsonpath='{.spec.clusterIP}' | xargs -I {} curl -X GET "http://{}:9200/_cluster/health?pretty"
+
+
+Notes: The validation script checks for a green status. In case of a yellow status, please click the arrow button to skip the validation.
+
+Access the Kubernetes Cluster:
+   kubectl get nodes
+Get the ClusterIP of Elasticsearch Service:
+   kubectl get svc -n efk
+Verify Elasticsearch Access:
+kubectl get svc elasticsearch -n efk -o jsonpath='{.spec.clusterIP}' | xargs -I {} curl -X GET "http://{}:9200/_cluster/health?pretty"
+The result should look like as shown below:
+
+{
+  "cluster_name" : "docker-cluster",
+  "status" : "green", # It also fine if status is yellow
+  "timed_out" : false,
+  "number_of_nodes" : 1,
+  "number_of_data_nodes" : 1,
+  "active_primary_shards" : 0,
+  "active_shards" : 0,
+  "relocating_shards" : 0,
+  "initializing_shards" : 0,
+  "unassigned_shards" : 0,
+  "delayed_unassigned_shards" : 0,
+  "number_of_pending_tasks" : 85,
+  "number_of_in_flight_fetch" : 0,
+  "task_max_waiting_in_queue_millis" : 22999,
+  "active_shards_percent_as_number" : 100.0
+}
+
+Deploying the Event Generator application on Kubernetes and Monitoring with Fluent Bit
+In this practical hands-on lab, you will deploy a simple Python application on a Kubernetes cluster and monitor it using Fluent Bit. Follow the steps below to complete the lab.
+
+Step 1: Clone the EFK Stack Repository
+Clone the Repository:
+Open a terminal and run the following command to clone the EFK stack repository from GitHub:
+   git clone https://github.com/kodekloudhub/efk-stack.git
+
+Deploy the Event Generator Application
+Deploy the Event Generator application from the provided source code directory (/root/efk-stack/event-generator/).
+
+You should see the Python application pod running.
+
+Navigate to the Event Generator Directory:
+Change to the directory containing the simple Python application:
+   cd /root/efk-stack/event-generator/
+Apply the Kubernetes Configuration:
+Deploy the Event Generator application by applying the Kubernetes configuration files in the current directory:
+   kubectl apply -f .
+Verify the Deployment:
+Check the status of the pods to ensure that the application has been deployed successfully:
+   kubectl get pods

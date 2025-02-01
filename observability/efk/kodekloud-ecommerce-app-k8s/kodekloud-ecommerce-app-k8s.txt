@@ -1,0 +1,192 @@
+Exploring and Analyzing Ecommerce Logs with the EFK Stack
+In these labs, you will set up and validate a Fluent Bit logging solution in a Kubernetes environment with Elasticsearch, Fluentd, and Kibana (EFK) already installed. The labs include both multiple-choice questions and hands-on tasks to help you understand and work with EFK.
+
+Initial Setup:
+
+Verify Cluster Configuration: Ensure you can access the Kubernetes cluster and that it is configured correctly for the EFK stack.
+Deployment:
+
+Apply Configurations: Deploy the event generator and Fluent Bit configurations using kubectl apply -f . from the cloned repository.
+Kibana Configuration:
+
+Access Kibana: Open the Kibana UI and set up index management to view logs.
+Verification:
+
+Check Log Streaming: Ensure Fluent Bit is streaming logs from the event generator pod to Kibana.
+Validation Tasks:
+
+Index Pattern Verification: Verify that the data view for the specified index pattern exists and is correctly set up in Kibana.
+
+What is the primary role of Fluent Bit in the EFK stack?
+
+Correct answer: Forward logs.
+
+Explanation: Fluent Bit is a lightweight log processor and forwarder that collects logs from various sources and sends them to a central location like Elasticsearch. It does not store or visualize logs but is crucial for log forwarding in the EFK stack.
+
+Which component in the EFK stack is responsible for aggregating and indexing log data?
+
+Correct answer: Elasticsearch.
+
+Explanation: Elasticsearch is the component of the EFK stack that aggregates, indexes, and stores log data, making it available for search and analysis.
+
+In Kibana, where would you create a data view for your logs?
+
+Correct answer: Index Management.
+
+Explanation: In Kibana, you create a data view (index pattern) under Index Management, which allows you to define how data from Elasticsearch indices should be queried and displayed.
+
+How do you verify that Fluent Bit is properly streaming logs to Elasticsearch?
+
+Correct answer: Inspect Elasticsearch indices for incoming data.
+
+Explanation: To verify that Fluent Bit is properly streaming logs to Elasticsearch, you should inspect Elasticsearch indices to ensure that new data is being indexed. This confirms that Fluent Bit is correctly forwarding the logs.
+
+Question 1: Setting Up the Environment
+Objective: Ensure the student is able to interact with the Kubernetes cluster and access Elasticsearch.
+
+Access the Kubernetes Cluster:
+
+Use kubectl commands to verify access to the Kubernetes cluster.
+Run: kubectl get nodes to ensure the cluster is up and running.
+Get the ClusterIP of Elasticsearch Service:
+
+Run: kubectl get svc -n efk to get the ClusterIP of the Elasticsearch service.
+Verify Elasticsearch Access:
+
+Use curl to check the health of the Elasticsearch cluster.
+kubectl get svc elasticsearch -n efk -o jsonpath='{.spec.clusterIP}' | xargs -I {} curl -X GET "http://{}:9200/_cluster/health?pretty"
+
+
+Notes: The validation script checks for a green status. In case of a yellow status, please click the arrow button to skip the validation.
+
+Access the Kubernetes Cluster:
+   kubectl get nodes
+Get the ClusterIP of Elasticsearch Service:
+   kubectl get svc -n efk
+Verify Elasticsearch Access:
+kubectl get svc elasticsearch -n efk -o jsonpath='{.spec.clusterIP}' | xargs -I {} curl -X GET "http://{}:9200/_cluster/health?pretty"
+The result should be similar to the JSON format shown below:
+
+{
+  "cluster_name" : "docker-cluster",
+  "status" : "green",
+  "timed_out" : false,
+  "number_of_nodes" : 1,
+  "number_of_data_nodes" : 1,
+  "active_primary_shards" : 0,
+  "active_shards" : 0,
+  "relocating_shards" : 0,
+  "initializing_shards" : 0,
+  "unassigned_shards" : 0,
+  "delayed_unassigned_shards" : 0,
+  "number_of_pending_tasks" : 85,
+  "number_of_in_flight_fetch" : 0,
+  "task_max_waiting_in_queue_millis" : 22999,
+  "active_shards_percent_as_number" : 100.0
+}
+
+Clone the EFK Stack Repository
+
+Task: Clone the GitHub repository containing the EFK stack setup to the /root directory.
+
+Repository URL: https://github.com/kodekloudhub/efk-stack.git
+
+Deploy the Event Generator
+
+Task: Deploy the event generator to generate logs for testing (/root/efk-stack/event-generator).
+
+Steps:
+Navigate to the event-generator directory: cd /root/efk-stack/event-generator.
+Apply the deployment configurations: kubectl apply -f ..
+If the app gets stuck in a pending state, then run the following command to remove the taint from the controlplane node.
+
+kubectl taint node controlplane node-role.kubernetes.io/control-plane-
+
+Create a Data View in Kibana
+Access the Kibana UI and navigate to Index Management.
+Locate the index named logstash-yyyy.dd.mm under the Indices section.
+Create a data view with the following specifications:
+Name: kubesystem
+Index Pattern: logstash-yyyy.dd.mm
+Save the data view and verify that it appears in the Discover tab.
+
+You should be able to verify the import with below command:
+
+curl -X GET "http://$(kubectl get svc kibana -n efk -o jsonpath='{.spec.clusterIP}'):5601/api/saved_objects/_find?type=index-pattern" -H 'kbn-xsrf: true'
+{
+    "page": 1,
+    "per_page": 20,
+    "total": 1,
+    "saved_objects": [
+        {
+            "type": "index-pattern",
+            "id": "e9d24f2b-cfc6-440c-9daf-c5f97d88c4e9",
+            "namespaces": [
+                "default"
+            ],
+            "attributes": {
+                "fieldAttrs": "{}",
+                "title": "logstash-2024.08.05",
+                "timeFieldName": "@timestamp",
+                "sourceFilters": "[]",
+                "fields": "[]",
+                "fieldFormatMap": "{}",
+                "runtimeFieldMap": "{}",
+                "name": "kubesystem",
+                "allowHidden": false
+            },
+            "references": [],
+            "managed": false,
+            "migrationVersion": {
+                "index-pattern": "8.0.0"
+            },
+            "updated_at": "2024-08-05T16:28:18.170Z",
+            "created_at": "2024-08-05T16:28:18.170Z",
+            "version": "WzUsMV0=",
+            "coreMigrationVersion": "8.8.0",
+            "typeMigrationVersion": "8.0.0",
+            "score": 0
+        }
+    ]
+}
+
+Verify Log Streaming
+Task: Confirm that logs are being properly streamed and indexed.
+
+Steps:
+
+Visit Kibana Dashboard and Verify Indexes:
+
+a. Open Kibana in your web browser.
+
+b. Navigate to the Index Management section. You can find this under Stack Management.
+
+c. Look for the Index named logstash-yyyy.mm.dd.
+
+d. Click on the index name to ensure it is available and has data.
+
+Run KQL Queries to Search for Specific Log Data:
+
+a. Go to the Discover section in Kibana.
+
+b. Select the index pattern corresponding to the logstash-yyyy.mm.dd index.
+
+c. In the search bar, enter the desired Kibana Query Language (KQL) query to search for logs:
+
+Answer the Following Question:
+
+Which KQL query should you use to find all logs related to users who encountered failed logins or other issues with the app?
+
+Explanations:
+
+USER* AND Failed*
+
+Explanation: This query searches for logs that include any text starting with "USER" and any text starting with "Failed". It might not be specific enough to capture only failed login attempts or issues if those keywords are used in different contexts.
+username:USER* AND status:Failed*
+
+Explanation: This query targets logs where the field username starts with "USER" and the field status starts with "Failed". It is more precise and structured, ensuring that the query focuses on logs related to user login failures or other specific issues based on field values.
+*ERROR* AND *LOGIN*
+
+Explanation: This query searches for logs that contain both "ERROR" and "LOGIN" anywhere in the text. It is broad and may capture various issues related to login errors but does not focus specifically on users or failed login attempts.
+Correct Answer:
+username:USER* AND status:Failed*, is the most accurate choice as it directly targets the relevant fields and values, ensuring the query is specific to user-related issues and failed login attempts.

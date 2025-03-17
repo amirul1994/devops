@@ -1,0 +1,23 @@
+cd ~/.ssh/
+
+aws ec2 create-key-pair --key-name jenkins_k3s --output text --query 'KeyMaterial' > jenkins_k3s.id_rsa
+
+chmod 400 jenkins_k3s.id_rsa
+
+on k3s-master, copy the content of /etc/rancher/k3s/k3s.yaml
+
+paste it on /var/lib/jenkins/.kube/config; edit the server with k3s-master's private ip address
+
+sudo chown -R jenkins:jenkins /var/lib/jenkins
+
+export KUBECONFIG=/var/lib/jenkins/.kube/config
+
+install nodejs on jenkins-master
+
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
+
+source ~/.bashrc
+
+nvm --version
+
+nvm install 18

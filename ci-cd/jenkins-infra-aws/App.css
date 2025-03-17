@@ -1,0 +1,19 @@
+.App {
+    text-align: center;
+    margin-top: 50px;
+}
+  
+.App input {
+    padding: 10px;
+    font-size: 16px;
+}
+  
+.App button {
+    margin-left: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
+}
+  
+.App h2 {
+    color: #4CAF50;
+}

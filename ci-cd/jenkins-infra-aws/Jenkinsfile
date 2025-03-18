@@ -27,7 +27,6 @@ pipeline {
                 sh '''
                     echo $(node -v)
                     echo $(java -version 2>&1 | sed -n '1p')
-                    echo
                 '''
             }
         }
@@ -35,7 +34,6 @@ pipeline {
             steps{
                 script{
                     def dockerVersion = sh(script: '''
-                        sudo chmod +x docker_version.sh
                         ./docker_version.sh
                     ''', returnStdout: true).trim()
                     

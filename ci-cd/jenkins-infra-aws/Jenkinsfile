@@ -43,23 +43,24 @@ pipeline {
                 }
             }
         }
-        // stage('Run Docker Check') {
-        //         steps {
-        //             script {
-        //                 // Debugging: List files in the workspace
-        //                 sh 'ls -la'
+//         // stage('Run Docker Check') {
+//         //         steps {
+//         //             script {
+//         //                 // Debugging: List files in the workspace
+//         //                 sh 'ls -la'
 
-        //                 // Ensure the script is executable and run it
-        //                 def dockerVersion = sh(script: '''
-        //                     set -e  # Exit immediately if a command fails
-        //                     sudo chmod +x docker_version.sh
-        //                     ./docker_version.sh
-        //                 ''', returnStdout: true).trim()
+//         //                 // Ensure the script is executable and run it
+//         //                 def dockerVersion = sh(script: '''
+//         //                     set -e  # Exit immediately if a command fails
+//         //                     sudo chmod +x docker_version.sh
+//         //                     ./docker_version.sh
+//         //                 ''', returnStdout: true).trim()
 
-        //                 // Print the captured output
-        //                 echo "Docker Version: ${dockerVersion}"
-        //             }
-        //        }
-}
-    }
+//         //                 // Print the captured output
+//         //                 echo "Docker Version: ${dockerVersion}"
+//         //             }
+//         //        }
+// }
+//     }
+ }
 }

@@ -36,10 +36,10 @@ pipeline {
                     
                     if (fileExists('ci-cd/jenkins-infra-aws/docker_version.sh')) {
                         
-                        sh 'chmod +x devops/ci-cd/jenkins-infra-aws/docker_version.sh'
+                        sh 'chmod +x ci-cd/jenkins-infra-aws/docker_version.sh'
 
                         
-                        sh './devops/ci-cd/jenkins-infra-aws/docker_version.sh'
+                        sh 'ci-cd/jenkins-infra-aws/docker_version.sh'
                     } else {
                         error("docker_version.sh not found in the workspace!")
                     }

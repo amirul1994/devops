@@ -21,7 +21,20 @@ pipeline {
                 sh '''
                     echo $(node -v)
                     echo $(java -version 2>&1 | sed -n '1p')
+                    echo
                 '''
+            }
+        }
+        stage('Run Docker Check'){
+            steps{
+                script{
+                    def dockerVersion = sh(script: '''
+                        chmod +x check_docker.sh
+                        bash check_docker.sh
+                    ''', returnStdout: true).trim()
+                    
+                    echo "$dockerVersion"
+                }
             }
         }
         stage('Clean Workspace'){

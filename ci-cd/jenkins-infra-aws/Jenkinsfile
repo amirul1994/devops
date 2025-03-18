@@ -31,8 +31,10 @@ pipeline {
                     
                     sh 'ls -la'
 
+                    sh 'ls -la ci-cd/jenkins-infra-aws/'
+
                     
-                    if (fileExists('devops/ci-cd/jenkins-infra-aws/docker_version.sh')) {
+                    if (fileExists('ci-cd/jenkins-infra-aws/docker_version.sh')) {
                         
                         sh 'chmod +x devops/ci-cd/jenkins-infra-aws/docker_version.sh'
 

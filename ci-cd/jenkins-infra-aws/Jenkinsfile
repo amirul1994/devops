@@ -32,7 +32,7 @@ pipeline {
         }
         stage('Docker Version') {
             steps {
-                            script {
+                script {
                     // Debug: List files in the workspace
                     sh 'ls -la'
 

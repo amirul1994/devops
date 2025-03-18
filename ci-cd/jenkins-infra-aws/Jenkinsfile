@@ -28,16 +28,16 @@ pipeline {
         stage('Docker Version') {
             steps {
                 script {
-                    // Debug: List files in the workspace
+                    
                     sh 'ls -la'
 
-                    // Ensure the script exists in the workspace
-                    if (fileExists('docker_version.sh')) {
-                        // Make the script executable
-                        sh 'chmod +x docker_version.sh'
+                    
+                    if (fileExists('devops/ci-cd/jenkins-infra-aws/docker_version.sh')) {
+                        
+                        sh 'chmod +x devops/ci-cd/jenkins-infra-aws/docker_version.sh'
 
-                        // Run the script
-                        sh './docker_version.sh'
+                        
+                        sh './devops/ci-cd/jenkins-infra-aws/docker_version.sh'
                     } else {
                         error("docker_version.sh not found in the workspace!")
                     }

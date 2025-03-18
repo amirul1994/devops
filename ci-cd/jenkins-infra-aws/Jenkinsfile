@@ -13,7 +13,7 @@ pipeline {
     stages {
         stage('OS Check'){
             steps{
-                sh "cat /etc/os-release | sed -n '1p'"
+                sh "cat /etc/os-release | sed -n 's/^PRETTY_NAME="\(.*\)"/\1/p'"
             }
         }
         stage('Clean Workspace'){

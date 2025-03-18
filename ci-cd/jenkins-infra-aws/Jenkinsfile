@@ -11,6 +11,11 @@ pipeline {
         timeout(time:30, unit:'MINUTES')
     }
     stages {
+        stage('Clean Workspace'){
+            steps{
+                cleanWs()
+            }
+        }
         stage('OS Check'){
             steps{
                 sh "cat /etc/os-release | sed -n 's/^PRETTY_NAME=\"\\(.*\\)\"/\\1/p'"
@@ -31,17 +36,13 @@ pipeline {
                 script{
                     def dockerVersion = sh(script: '''
                         chmod +x docker_version.sh
-                        bash docker_version.sh
+                        ./docker_version.sh
                     ''', returnStdout: true).trim()
                     
                     echo "$dockerVersion"
                 }
             }
         }
-        // stage('Clean Workspace'){
-        //     steps{
-        //         cleanWs()
-        //     }
-        // }
+        
     }
 }

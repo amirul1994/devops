@@ -27,17 +27,27 @@ pipeline {
                 sh '''
                     echo $(node -v)
                     echo $(java -version 2>&1 | sed -n '1p')
-                    ./docker_version.sh
                 '''
             }
         }
-        stage('Docker Version'){
-            steps{
-                sh '''
-                    cd /mnt/lvm_storage/devops/ci-cd/jenkins-infra-aws
-                    ./docker_version.sh
-                '''
-            }
+        stage('Docker Version') {
+            steps {
+                            script {
+                    // Debug: List files in the workspace
+                    sh 'ls -la'
+
+                    // Ensure the script exists in the workspace
+                    if (fileExists('docker_version.sh')) {
+                        // Make the script executable
+                        sh 'chmod +x docker_version.sh'
+
+                        // Run the script
+                        sh './docker_version.sh'
+                    } else {
+                        error("docker_version.sh not found in the workspace!")
+                    }
+                }
+             }
         }
         // stage('Checkout') {
         //     steps {

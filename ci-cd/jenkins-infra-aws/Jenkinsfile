@@ -16,6 +16,14 @@ pipeline {
                 sh "cat /etc/os-release | sed -n 's/^PRETTY_NAME=\"\\(.*\\)\"/\\1/p'"
             }
         }
+        stage('Software Check'){
+            steps{
+                sh '''
+                    echo $(node -v)
+                    echo $(java -version 2>&1 | sed -n '1p')
+                '''
+            }
+        }
         stage('Clean Workspace'){
             steps{
                 cleanWs()

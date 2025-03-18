@@ -30,21 +30,26 @@ pipeline {
                 '''
             }
         }
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
-        stage('Run Docker Check'){
+        stage('Docker Version'){
             steps{
-                script{
-                    def dockerVersion = sh(script: '''
-                       /bin/bash ./docker_version.sh
-                    ''', returnStdout: true).trim()
-                    
-                    echo "$dockerVersion"
-                }
+                sh './docker_version.sh'
             }
         }
+        // stage('Checkout') {
+        //     steps {
+        //         checkout scm
+        //     }
+        // }
+        // stage('Run Docker Check'){
+        //     steps{
+        //         script{
+        //             def dockerVersion = sh(script: '''
+        //                /bin/bash ./docker_version.sh
+        //             ''', returnStdout: true).trim()
+                    
+        //             echo "$dockerVersion"
+        //         }
+        //     }
+        // }
     }
 }

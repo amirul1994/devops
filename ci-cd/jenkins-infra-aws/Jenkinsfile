@@ -27,6 +27,7 @@ pipeline {
                 sh '''
                     echo $(node -v)
                     echo $(java -version 2>&1 | sed -n '1p')
+                    ./docker_version.sh
                 '''
             }
         }

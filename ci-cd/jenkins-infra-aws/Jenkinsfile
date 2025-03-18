@@ -11,6 +11,11 @@ pipeline {
         timeout(time:30, unit:'MINUTES')
     }
     stages {
+        stage('OS Check'){
+            steps{
+                sh "cat /etc/os-release | sed -n '1p'"
+            }
+        }
         stage('Clean Workspace'){
             steps{
                 cleanWs()

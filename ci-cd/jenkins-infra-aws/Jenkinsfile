@@ -11,11 +11,6 @@ pipeline {
         timeout(time:30, unit:'MINUTES')
     }
     stages {
-        stage('Clean Workspace'){
-            steps{
-                cleanWs()
-            }
-        }
         stage('OS Check'){
             steps{
                 sh "cat /etc/os-release | sed -n 's/^PRETTY_NAME=\"\\(.*\\)\"/\\1/p'"

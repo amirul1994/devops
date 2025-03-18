@@ -32,7 +32,10 @@ pipeline {
         }
         stage('Docker Version'){
             steps{
-                sh './docker_version.sh'
+                sh '''
+                    cd /mnt/lvm_storage/devops/ci-cd/jenkins-infra-aws
+                    ./docker_version.sh
+                '''
             }
         }
         // stage('Checkout') {

@@ -64,5 +64,16 @@ pipeline {
                 git branch: 'main', url:'https://github.com/amirul1994/devops.git'
             }
         }
+        stage('Install Dependencies'){
+            steps{
+                dir('frontend'){
+                    sh """
+                        npm cache clean --force
+                        rm -rf node_modules package-lock.json
+                        npm install
+                    """
+                }
+            }
+        }
     }
 }

@@ -54,7 +54,7 @@ pipeline {
                 sh '''
                     docker system prune -a -f --volumes || true
                     if docker images ${DOCKER_IMAGES} -q | grep -q .;then
-                        docker rmi $(docker images ${DOCKER_IMAGE} -q) || true
+                        docker rmi -f $(docker images ${DOCKER_IMAGE} -q) || true
                     fi
                 '''
             }

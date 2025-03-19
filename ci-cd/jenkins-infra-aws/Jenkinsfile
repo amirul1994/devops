@@ -66,7 +66,7 @@ pipeline {
         }
         stage('Install Dependencies'){
             steps{
-                dir('frontend'){
+                dir('ci-cd/jenkins-infra-aws/simple-react-app'){
                     sh """
                         npm cache clean --force
                         rm -rf node_modules package-lock.json

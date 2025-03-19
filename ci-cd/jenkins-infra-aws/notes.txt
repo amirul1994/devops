@@ -30,3 +30,10 @@ before execute this stage, stop the docker container
 
 stage Docker Build & Push
 BUILD_NUMBER: built-in environment variable storing the current build number.
+To push the image successfully to the dockerhub, must use the correct dockerhub 
+username. [def fullImageName = "amirul1994/${DOCKER_IMAGE}:${imageTag}"; amirul1994
+is the dockerhub username]
+If token is used in place of the password, it has to have read & write permission.
+Another important thing to notice, use 'url' in the  'withDockerRegistry()', exclusion
+of 'url' will lead to failed attempt.
+The 'getMessage()' shows the error in human readable format.

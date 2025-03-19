@@ -87,7 +87,7 @@ pipeline {
                         echo "Full Image Name: ${fullImageName}"
 
                         dir('ci-cd/jenkins-infra-aws/simple-react-app'){
-                            withDockerRegistry(credentialsId:'dockerhub',toolName:'Docker'){
+                            withDockerRegistry(credentialsId:'dockerhub', url: "", toolName:'Docker'){
                                 sh """
                                     docker build --no-cache -t ${fullImageName} . || (echo 'Docker build failed' && exit 1)
                                     docker push ${fullImageName} || (echo 'Docker push failed' && exit 1) 

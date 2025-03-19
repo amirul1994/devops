@@ -75,5 +75,27 @@ pipeline {
                 }
             }
         }
+        stage('Docker Build & Push'){
+            steps{
+                script{
+                    try{
+                        def imageTag="${BUILD_NUMBER}"
+                        def fullImageName="${DOCKER_IMAGE}:${imageTag}"
+
+                        dir('ci-cd/jenkins-infra-aws/simple-react-app'){
+                            withDockerRegistry(credentialsId:'dockerhub',toolName:'Docker'){
+                                sh """
+                                    docker build --no-cache -t ${fullImageName} . || (echo 'Docker build failed' && exit 1)
+                                    docker push ${fullImageName} || (echo 'Docker push failed' && exit 1) 
+                                """
+                            }
+                        }
+                    }catch (Exception e){
+                        echo "Docker build or push failed: ${e.getMessage()}"
+                        throw e
+                    }
+                }
+            }
+        }
     }
 }

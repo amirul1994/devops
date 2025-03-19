@@ -28,3 +28,5 @@ docker images ${DOCKER_IMAGES} -q | grep -q .
 
 before execute this stage, stop the docker container
 
+stage Docker Build & Push
+BUILD_NUMBER: built-in environment variable storing the current build number

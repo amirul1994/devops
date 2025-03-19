@@ -80,7 +80,7 @@ pipeline {
                 script{
                     try{
                         def imageTag="${BUILD_NUMBER}"
-                        def fullImageName = "amirul1994/simple-react-app:${imageTag}"
+                        def fullImageName = "amirul1994/${DOCKER_IMAGE}:${imageTag}"
 
                         // echo "DOCKER_IMAGE: ${DOCKER_IMAGE}"
                         // echo "BUILD_NUMBER: ${BUILD_NUMBER}"

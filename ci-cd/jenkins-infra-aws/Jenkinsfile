@@ -11,6 +11,11 @@ pipeline {
         timeout(time:30, unit:'MINUTES')
     }
     stages {
+        stage('Clean Workspace'){
+            steps{
+                cleanWs()
+            }
+        }
         stage('OS Check'){
             steps{
                 sh "cat /etc/os-release | sed -n 's/^PRETTY_NAME=\"\\(.*\\)\"/\\1/p'"
@@ -33,12 +38,10 @@ pipeline {
 
                     sh 'ls -la ci-cd/jenkins-infra-aws/'
 
-                    
                     if (fileExists('ci-cd/jenkins-infra-aws/docker_version.sh')) {
                         
                         sh 'chmod +x ci-cd/jenkins-infra-aws/docker_version.sh'
 
-                        
                         sh 'ci-cd/jenkins-infra-aws/docker_version.sh'
                     } else {
                         error("docker_version.sh not found in the workspace!")
@@ -46,21 +49,15 @@ pipeline {
                 }
              }
         }
-        // stage('Checkout') {
-        //     steps {
-        //         checkout scm
-        //     }
-        // }
-        // stage('Run Docker Check'){
-        //     steps{
-        //         script{
-        //             def dockerVersion = sh(script: '''
-        //                /bin/bash ./docker_version.sh
-        //             ''', returnStdout: true).trim()
-                    
-        //             echo "$dockerVersion"
-        //         }
-        //     }
-        // }
+        stage('Docker System Cleanup'){
+            steps{
+                sh '''
+                    docker system prune -a -f --volumes || true
+                    if docker images ${DOCKER_IMAGES} -q | grep -q .;then
+                        docker rmi $(docker images ${DOCKER_IMAGE} -q) || true
+                    fi
+                '''
+            }
+        }
     }
 }

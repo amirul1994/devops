@@ -1,0 +1,27 @@
+stage Clean Workspace 
+clean everything of the previous build
+
+stage OS Check
+
+sed -n 's/^PRETTY_NAME=\"\\(.*\\)\"/\\1/p
+
+In this command, extra '\' (escape character) are used due to jenkins interpretation of '\'.
+In Jenkins pipeline, '\' is interpreted by Groovy interpreter and shell.
+The original command is
+
+sed -n 's/^PRETTY_NAME="\(.*\)"/\1/p' /etc/os-release
+
+stage Docker Version
+In Jenkins, when the code is pushed to the repo, 
+Jenkins pulls the code from the repo to its workspace, 
+the directory structure will be according to this; 
+judging based on the current location will be a mistake; 
+the Jenkins workspace location is /var/lib/jenkins/workspace; 
+the owner of the location is Jenkins.
+
+stage Docker System Cleanup
+docker system prune -a -f --volumes
+-a: all, -f: force, --volumes: to delete with volumes
+
+docker images ${DOCKER_IMAGES} -q | grep -q .
+-q: only output image id, -q: silent, . : matches any single character

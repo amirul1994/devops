@@ -59,5 +59,10 @@ pipeline {
                 '''
             }
         }
+        stage('Checkout form Git'){
+            steps{
+                git branch: 'main', url:'https://github.com/amirul1994/devops.git'
+            }
+        }
     }
 }

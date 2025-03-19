@@ -25,3 +25,6 @@ docker system prune -a -f --volumes
 
 docker images ${DOCKER_IMAGES} -q | grep -q .
 -q: only output image id, -q: silent, . : matches any single character
+
+before execute this stage, stop the docker container
+

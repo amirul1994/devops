@@ -82,6 +82,10 @@ pipeline {
                         def imageTag="${BUILD_NUMBER}"
                         def fullImageName="${DOCKER_IMAGE}:${imageTag}"
 
+                        echo "DOCKER_IMAGE: ${DOCKER_IMAGE}"
+                        echo "BUILD_NUMBER: ${BUILD_NUMBER}"
+                        echo "Full Image Name: ${fullImageName}"
+
                         dir('ci-cd/jenkins-infra-aws/simple-react-app'){
                             withDockerRegistry(credentialsId:'dockerhub',toolName:'Docker'){
                                 sh """

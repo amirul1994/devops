@@ -140,7 +140,7 @@ pipeline {
 
                                 timeout 300s kubectl rollout status deployment/simple-react || (echo 'Deployment rollout failed' && exit 1)
 
-                                kubectl get pods | grep simple-react
+                                kubectl get pods | grep simple-react*
                             """
                         }
                     }catch(Exception e){

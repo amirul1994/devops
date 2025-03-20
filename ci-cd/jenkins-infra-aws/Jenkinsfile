@@ -5,7 +5,7 @@ pipeline {
         nodejs 'NODE-18'
     }
     environment {
-        DOCKER_IMAGE='simple-react-app'
+        DOCKER_IMAGE='amirul1994/simple-react-app'
     }
     options {
         timeout(time:30, unit:'MINUTES')
@@ -80,7 +80,7 @@ pipeline {
                 script{
                     try{
                         def imageTag="${BUILD_NUMBER}"
-                        def fullImageName = "amirul1994/${DOCKER_IMAGE}:${imageTag}"
+                        def fullImageName = "${DOCKER_IMAGE}:${imageTag}"
 
                         // echo "DOCKER_IMAGE: ${DOCKER_IMAGE}"
                         // echo "BUILD_NUMBER: ${BUILD_NUMBER}"
@@ -96,6 +96,26 @@ pipeline {
                         }
                     }catch (Exception e){
                         echo "Docker build or push failed: ${e.getMessage()}"
+                        throw e
+                    }
+                }
+            }
+        }
+        stage('Update ConfigMap'){
+            steps{
+                script{
+                    try{
+                        def imageTag="${BUILD_NUMBER}"
+                        withKubeConfig([credentialsId:'kubernetes-config']){
+                            sh"""
+                                kubectl create configmap image-tag-config \
+                                    --from-literal=IMAGE_TAG=${imageTag}\
+                                    --dry-run=client -o yaml | \
+                                kubectl apply -f - || (echo 'ConfigMap update failed' && exit 1)
+                            """
+                        }
+                    }catch(Exception e){
+                        echo "ConfigMap update failed:${e.getMessage()}"
                         throw e
                     }
                 }

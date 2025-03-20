@@ -37,3 +37,9 @@ If token is used in place of the password, it has to have read & write permissio
 Another important thing to notice, use 'url' in the  'withDockerRegistry()', exclusion
 of 'url' will lead to failed attempt.
 The 'getMessage()' shows the error in human readable format.
+
+stage Update ConfigMap
+kubectl apply -f -
+the last '-' will read the input from the standard input of the previous command 
+(kubectl create configmap....)
+   

@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: simple-react-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: simple-react-app
+  template:
+    metadata:
+      labels:
+        app: simple-react-app
+    spec:
+      containers:
+      - name: simple-react-app
+        image: amirul1994/simple-react-app:54
+        ports:
+        - containerPort: 80

@@ -121,5 +121,32 @@ pipeline {
                 }
             }
         }
+        stage('Deploy to Kubernetes'){
+            steps{
+                script{
+                    try{
+                        def imageTag="${BUILD_NUMBER}"
+                        withKubeConfig([credentialsId:'kubernetes-config']){
+                            sh"""
+                                kubectl get nodes || (echo 'kubernetes cluster connection failed' && exit 1)
+
+                                sed -i 's|${DOCKER_IMAGE}:[^\"]*|${DOCKER_IMAGE}:${imageTag}|'kubernetes/deployment.yaml
+
+                                kubectl apply -f kubernetes/deployment.yaml || (echo 'deployment apply failed' && exit 1)
+
+                                kubectl apply -f kubernetes/service.yaml || (echo 'service apply failed' && exit 1)
+
+                                timeout 300s kubectl rollout status deployment/simple-react || (echo 'Deployment rollout failed' && exit 1)
+
+                                kubectl get pods | grep simple-react
+                            """
+                        }
+                    }catch(Exception e){
+                        echo "kubernetes deployment failed:${e.getMessage()}"
+                        throw e
+                    }
+                }
+            }
+        }
     }
 }

@@ -15,5 +15,11 @@ spec:
       containers:
       - name: simple-react-app
         image: amirul1994/simple-react-app:54
+        env:
+        - name: image-tag
+          valueFrom:
+            configMapKeyRef:
+              name: image-tag-config
+              key: IMAGE_TAG
         ports:
         - containerPort: 80

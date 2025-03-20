@@ -138,7 +138,7 @@ pipeline {
 
                                 kubectl apply -f kubernetes/service.yaml || (echo 'service apply failed' && exit 1)
 
-                                timeout 300s kubectl rollout status deployment/simple-react || (echo 'Deployment rollout failed' && exit 1)
+                                timeout 300s kubectl rollout status deployment/simple-react-app || (echo 'Deployment rollout failed' && exit 1)
 
                                 kubectl get pods | grep simple-react*
                             """
@@ -147,6 +147,37 @@ pipeline {
                         echo "kubernetes deployment failed:${e.getMessage()}"
                         throw e
                     }
+                }
+            }
+        }
+    }
+    post{
+        always{
+            echo "pipeline execution completed"
+            sh 'docker system prune -af --volumes || true'
+        }
+
+        success{
+            echo "deployment successful"
+            echo "access the app at nodeport 30001"
+        }
+
+        failure {
+            echo "deployment failed, please check the logs"
+            script{
+                try{
+                    withKubeConfig([credentialsId:'kubernetes-config']){
+                        sh"""
+                            echo 'kubernetes deployment status:'
+                            kubectl get deployments
+                            echo 'pod status:'
+                            kubectl get pods
+                            echo 'recent pod logs:'
+                            kubectl logs -l app=simple-react-app --tail=50 || true
+                        """
+                    }
+                }catch(Exception e){
+                    echo "failed to fetch debug information: ${e.getMessage()}"
                 }
             }
         }

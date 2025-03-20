@@ -130,7 +130,7 @@ pipeline {
                             sh"""
                                 kubectl get nodes || (echo 'kubernetes cluster connection failed' && exit 1)
 
-                                sed -i 's|${DOCKER_IMAGE}:[^\"]*|${DOCKER_IMAGE}:${imageTag}|'kubernetes/deployment.yaml
+                                sed -i 's#${DOCKER_IMAGE}:[^"]*#${DOCKER_IMAGE}:${imageTag}#' kubernetes/deployment.yaml
 
                                 kubectl apply -f kubernetes/deployment.yaml || (echo 'deployment apply failed' && exit 1)
 

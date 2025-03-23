@@ -1,0 +1,30 @@
+events {
+    worker_connections 1024;
+}
+
+http {
+    server {
+        listen {{ nginx_http_port }};
+        server_name {{ nginx_server_name }};
+
+        location / {
+            return 301 https://$host:{{ nginx_https_port }}$request_uri;
+        }
+    }
+
+    server {
+        listen {{ nginx_https_port }} ssl;
+        server_name {{ nginx_server_name }};
+
+        ssl_certificate /etc/ssl/certs/nginx-selfsigned.crt;
+        ssl_certificate_key /etc/ssl/private/nginx-selfsigned.key;
+
+        ssl_protocols TLSv1.2 TLSv1.3;
+        ssl_ciphers HIGH:!aNULL:!MD5;
+
+        location / {
+            root /usr/share/nginx/html;
+            index index.html;
+        }
+    }
+}

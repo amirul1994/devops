@@ -1,0 +1,62 @@
+# Scenario 1: Create an Ansible Playbook to Install and Configure Nginx
+# Scenario: Create an Ansible playbook to install and configure Nginx. For HTTP, use port 8080,
+# and for HTTPS, use port 8443. Generate a self-signed certificate and key for Nginx to use.
+# Ensure that the Nginx service is running and configured to start at boot.
+
+- name: install and configure nginx with ssl
+  hosts: hosts
+  become: true
+  vars: 
+    nginx_http_port: 8080
+    nginx_https_port: 8443
+    nginx_server_name: localhost
+  tasks:
+    - name: install nginx (ubuntu24)
+      ansible.builtin.apt:  
+        name: nginx
+        state: present
+      when: ansible_os_family == "Debian"
+    
+    - name: install nginx (rocky)
+      ansible.builtin.dnf:
+        name: nginx
+        state: present
+      when: ansible_os_family == "RedHat"
+    
+    - name: ssl directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0750'
+      loop:
+        - /etc/ssl/certs
+        - /etc/ssl/private
+    
+    - name: generate self-signed certificate and key
+      ansible.builtin.shell: |
+        openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+          -keyout /etc/ssl/private/nginx-selfsigned.key \
+          -out /etc/ssl/certs/nginx-selfsigned.crt \
+          -subj "/CN={{ nginx_server_name }}" \
+          -addext "subjectAltName=DNS:{{ nginx_server_name }}"
+      args:
+        creates: /etc/ssl/certs/nginx-selfsigned.crt
+    
+    - name: configure nginx with different ports
+      ansible.builtin.template:
+        src: nginx.conf.j2
+        dest: /etc/nginx/nginx.conf
+        mode: '0644'
+      notify: restart nginx
+
+    - name: ensure nginx is started and enabled
+      ansible.builtin.service:
+        name: nginx
+        state: started
+        enabled: true
+  
+  handlers:
+    - name: restart nginx
+      ansible.builtin.service:
+        name: nginx
+        state: restarted

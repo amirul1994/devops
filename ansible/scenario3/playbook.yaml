@@ -1,3 +1,7 @@
+# Scenario: Create an Ansible playbook to install and configure PHP with Apache Web Server.
+# Ensure Apache listens on port 9090, install PHP, and configure the system to run Apache and
+# PHP at boot.
+
 - name: install and configure php with apache
   hosts: hosts
   become: yes

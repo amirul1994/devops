@@ -1,0 +1,22 @@
+before applying the playbook
+
+on rocky linux 9
+
+sudo dnf list mysql*
+
+sudo firewall-cmd --list-all
+sudo firewall-cmd --zone=public --add-port=9090/tcp --permanent
+sudo firewall-cmd --reload
+
+temporary stop selinux
+getenforce
+sudo setenforce 0
+
+permanently stop selinux
+sudo vim /etc/selinux/config
+
+change 
+SELINUX=enforcing
+to SELINUX=disabled
+
+sudo reboot

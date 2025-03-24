@@ -4,7 +4,7 @@ It will ask for providing password
 in the editor add the following 
 mysql_root_password: "your password"
 
-to view the secrets..yml 
+to view the secrets.yml 
 ansible-vault view secrets.yml
 
 run with vault password, otherwise it will lead to an error 

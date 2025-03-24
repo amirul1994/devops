@@ -1,0 +1,82 @@
+# Scenario: Create an Ansible playbook to install and configure MySQL Database Server. Set the
+# root password and ensure that the MySQL service is started and enabled to
+# run at boot.
+
+- name: install and configure mysql
+  hosts: hosts
+  become: yes
+  vars_files:
+    - secrets.yml
+  vars:
+    mysql_bind_address: "{{ '192.168.0.51' if ansible_os_family == 'Debian' else '192.168.0.52' }}"
+  
+  tasks:
+    - name: install mysql on rocky linux 9
+      ansible.builtin.dnf:
+        name: mysql-server
+        state: present
+      when: ansible_os_family == "RedHat"
+
+    - name: install mysql on ubuntu24
+      ansible.builtin.apt:
+        name: mysql-server
+        state: present
+      when: ansible_os_family == "Debian"
+    
+    - name: mysql bind address for ubuntu 24
+      ansible.builtin.lineinfile:
+        path: "/etc/mysql/mysql.conf.d/mysqld.cnf"
+        regexp: '^bind-address'
+        line: "bind-address = {{ mysql_bind_address }}"
+        state: present
+      notify: restart mysql service
+      when: ansible_os_family == "Debian"
+    
+    - name: mysql bind address for rocky linux 9
+      ansible.builtin.lineinfile:
+        path: "/etc/my.cnf.d/mysql-server.cnf"
+        regexp: '^bind-address'
+        line: "bind-address = {{ mysql_bind_address }}"
+        state: present
+      notify: restart mysql service
+      when: ansible_os_family == "RedHat"
+        
+    - name: mysql service on rocky linux 9
+      ansible.builtin.service:
+        name: mysqld
+        state: started 
+        enabled: yes
+      when: ansible_os_family == "RedHat"
+
+    - name: mysql service on ubuntu 24
+      ansible.builtin.service:
+        name: mysql
+        state: started
+        enabled: yes
+      when: ansible_os_family == "Debian"
+
+    - name: install pymysql on rocky linux 9
+      ansible.builtin.dnf:
+        name: python3-PyMySql
+        state: present
+      when: ansible_os_family == "RedHat"
+
+    - name: install pymysql on ubuntu 24
+      ansible.builtin.apt:
+        name: python3-pymysql
+        state: present
+      when: ansible_os_family == "Debian"
+    
+    - name: change authentication for mysql
+      ansible.builtin.shell: |
+        sudo mysql -u root -e "
+          ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '{{ mysql_root_password }}';
+          FLUSH PRIVILEGES;
+        " 
+      notify: restart mysql service
+    
+  handlers:
+    - name: restart mysql service
+      ansible.builtin.service:
+        name: "{{ 'mysqld' if ansible_os_family == 'RedHat' else 'mysql' }}"
+        state: restarted

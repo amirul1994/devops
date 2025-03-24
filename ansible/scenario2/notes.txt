@@ -1,0 +1,11 @@
+ansible-vault create secrets.yml
+It will ask for providing password
+
+in the editor add the following 
+mysql_root_password: "qwdsjk54"
+
+to view the secrets..yml 
+ansible-vault view secrets.yml
+
+run with vault password, otherwise it will lead to an error 
+ansible-playbook playbook.yml --ask-vault-pass -vvv

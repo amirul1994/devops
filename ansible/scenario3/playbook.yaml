@@ -1,0 +1,46 @@
+- name: install and configure php with apache
+  hosts: hosts
+  become: yes
+  vars: 
+    apache_service_name: "{{ 'apache2' if ansible_os_family == 'Debian' else 'httpd' }}"
+    php_packages:
+      - "{{ 
+            ['php'] if ansible_os_family == 'Debian' 
+            else ['php', 'php-mysqlnd'] 
+         }}"
+    apache_config_path: "{{ '/etc/apache2/ports.conf' if ansible_os_family == 'Debian' else '/etc/httpd/conf/httpd.conf' }}"
+    new_listen_port: "9090"
+  tasks:
+    - name: install apache and php
+      block:
+        - name: install apache and php on ubuntu 24
+          ansible.builtin.apt:
+            name: "{{ ([apache_service_name] + php_packages) | flatten }}"
+            state: present
+          when: ansible_os_family == 'Debian'
+
+        - name: install apache and php on rocky linux 9
+          ansible.builtin.dnf:
+            name: "{{ ([apache_service_name] + php_packages) | flatten }}"
+            state: present
+          when: ansible_os_family == 'RedHat'
+    
+    
+    - name: configure apache to listen on port 9090
+      ansible.builtin.lineinfile:
+        path: "{{ apache_config_path }}"
+        regexp: '^Listen 80$'
+        line: 'Listen {{ new_listen_port }}'
+      notify: restart apache
+    
+    - name: enable apache on boot
+      ansible.builtin.service:
+        name: "{{ apache_service_name }}"
+        state: started
+        enabled: yes
+  
+  handlers:
+    - name: restart apache
+      ansible.builtin.service:
+        name: "{{ apache_service_name }}"
+        state: restarted

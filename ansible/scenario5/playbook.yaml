@@ -1,0 +1,51 @@
+- name: install and configure jenkins on ec2 instance
+  hosts: jenkins_servers
+  become: yes
+  tasks:
+    - name: update apt cache
+      apt:
+        update_cache: yes
+    
+    - name: install java
+      apt:
+        name: openjdk-21-jdk
+        state: present
+    
+    - name: add jenkins apt repository key
+      apt_key:
+        url: https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+        state: present
+    
+    - name: add jenkins apt repository
+      apt_repository:
+        repo: deb https://pkg.jenkins.io/debian-stable binary/
+        state: present
+    
+    - name: install jenkins
+      apt:
+        name: jenkins
+        state: present
+    
+    - name: start jenkins service
+      service:
+        name: jenkins
+        state: started
+        enabled: yes
+    
+    - name: sleep for 30 seconds to allow Jenkins to start
+      pause: 
+        seconds: 30
+    
+    - name: get jenkins initial admin password 
+      command: cat /var/lib/jenkins/secrets/initialAdminPassword
+      register: jenkins_password
+      changed_when: false
+    
+    - name: display jenkins initial admin password
+      debug:
+        var: jenkins_password.stdout
+    
+    - name: allow port
+      ufw:
+        rule: allow
+        port: '8080'

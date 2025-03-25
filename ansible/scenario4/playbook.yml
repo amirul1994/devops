@@ -1,0 +1,74 @@
+- name: configure nginx as reverse proxy and load balancer
+  hosts: hosts
+  become: yes
+  vars:
+    nginx_user: "{{ ansible_user }}"
+    nginx_group: "{{ ansible_user }}"
+  tasks: 
+    - name: install nginx (ubuntu 24)
+      ansible.builtin.apt:
+        name: nginx
+        state: present
+        update_cache: yes
+      when: ansible_os_family == "Debian"
+
+    - name: install nginx (rocky linux 9)
+      ansible.builtin.dnf:
+        name: nginx
+        state: present
+      when: ansible_os_family == "RedHat"
+
+    - name: create nginx configuration directory
+      ansible.builtin.file:
+        path: /etc/nginx/conf.d
+        state: directory
+        owner: "{{ nginx_user }}"
+        group: "{{ nginx_group }}"
+        mode: '0755'  
+    
+    - name: configure nginx as reverse proxy and load balancer
+      ansible.builtin.copy:
+        content: |
+          upstream backend {
+            server 10.0.0.1;
+            server 10.0.0.2;
+          }
+
+          server {
+            server_name localhost;
+
+            location / {
+              proxy_pass http://backend;
+              proxy_set_header Host $host;
+              proxy_set_header X-Real-IP $remote_addr;
+              proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+              proxy_set_header X-Forwarded-Proto $scheme;
+            }
+          }
+        dest: /etc/nginx/conf.d/load_balancer.conf
+        owner: "{{ nginx_user }}"
+        group: "{{ nginx_group }}"
+        mode: '0644'
+    
+    - name: validation check
+      ansible.builtin.command:
+        cmd: nginx -t
+      register: nginx_test_result
+      ignore_errors: yes
+    
+    - name: debug nginx configuration test result
+      ansible.builtin.debug:
+        msg: "{{ nginx_test_result.stdout_lines }}"
+      when: nginx_test_result.rc != 0
+
+    - name: reload nginx
+      ansible.builtin.service:
+        name: nginx
+        state: reloaded
+      when: nginx_test_result.rc == 0
+
+    - name: start and enable nginx
+      ansible.builtin.service:
+        name: nginx
+        state: started
+        enabled: yes

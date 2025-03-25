@@ -1,3 +1,6 @@
+# Scenario: Create an Ansible playbook to configure Nginx as a reverse proxy and load balancer
+# Ensure Nginx is started and enabled at boot.
+
 - name: configure nginx as reverse proxy and load balancer
   hosts: hosts
   become: yes
@@ -30,8 +33,8 @@
       ansible.builtin.copy:
         content: |
           upstream backend {
-            server 10.0.0.1;
-            server 10.0.0.2;
+            server 10.0.0.1:8080;
+            server 10.0.0.2:8080;
           }
 
           server {

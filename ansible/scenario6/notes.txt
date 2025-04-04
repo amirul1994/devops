@@ -1,0 +1,22 @@
+Use the poridhi, for ubuntu
+
+for centos/rocky/alma linux 9, read the official docker documentation
+
+(Docker’s official CentOS 9 Stream repo is compatible with Rocky Linux 9)
+
+first:
+
+sudo tee /etc/yum.repos.d/docker-ce-stable.repo <<'EOF'
+[docker-ce-stable]
+name=Docker CE Stable - $basearch
+baseurl=https://download.docker.com/linux/centos/$releasever/$basearch/stable
+enabled=1
+gpgcheck=1
+gpgkey=https://download.docker.com/linux/centos/gpg
+EOF
+
+then:
+use these commands in the playbook
+sudo dnf -y install dnf-plugins-core
+sudo dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+sudo dnf install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin

@@ -1,4 +1,10 @@
-Use the poridhi, for ubuntu
+Use the poridhi, for ubuntu; if ca-certificates is previously configured remove it
+
+sudo apt remove -y ca-certificates
+sudo apt purge ca-certificates --auto-remove
+sudo rm -rf /etc/ssl/certs/ /usr/share/ca-certificates/ /usr/local/share/ca-certificates/
+dpkg -L ca-certificates  
+ls /etc/ssl/certs/
 
 for centos/rocky/alma linux 9, read the official docker documentation
 

@@ -1,0 +1,80 @@
+- name: install and configure redis on ubuntu 24 & rocky linux 9
+  hosts: hosts
+  become: yes
+  vars_files:
+    - redis-password.yml
+  tasks:
+    - name: update package cache (ubuntu 24)
+      apt:
+        update_cache: yes
+      when: ansible_os_family == "Debian"
+    
+    - name: update package cache (rocky linux 9)
+      dnf:
+        update_cache: yes
+      when:
+        ansible_os_family == "RedHat"
+
+    - name: install redis (ubuntu 24)
+      apt:
+        name: redis-server
+        state: present
+      when: ansible_os_family == "Debian"
+    
+    - name: install redis (rocky linux 9)
+      dnf:
+        name: redis
+        state: present
+      when: ansible_os_family == "RedHat"
+    
+    - name: ensure redis is running and enabled
+      service:
+        name: "{{ 'redis-server' if ansible_os_family == 'Debian' else 'redis' }}"
+        state: started
+        enabled: yes
+
+    - name: add user to the redis group (ubuntu 24)
+      user:
+        name: ansible-2
+        groups: redis
+        append: yes
+      when: ansible_os_family == "Debian"
+    
+    - name: add user to the redis group (rocky linux 9)
+      user:
+        name: ansible-3
+        groups: redis
+        append: yes
+      when: ansible_os_family == "RedHat"
+
+    - name: change permission 
+      file:
+        path: /etc/redis/redis.conf
+        owner: redis
+        group: redis
+        mode: '0770'
+    
+    - name: restart redis before editing the config file
+      service:
+        name: "{{ 'redis-server' if ansible_os_family == 'Debian' else 'redis' }}"
+        state: restarted
+    
+    - name: configure redis to accept remote connections
+      lineinfile:
+        path: /etc/redis/redis.conf
+        regexp: '^#?bind 127\.0\.0\.1'
+        line: 'bind 0.0.0.0'
+      notify: restart redis
+    
+    - name: set redis password
+      blockinfile:
+        path: /etc/redis/redis.conf
+        block: |
+          requirepass "{{ redis_password }}"
+      notify: restart redis
+  
+  handlers:
+    - name: restart redis
+      service:
+        name: "{{ 'redis-server' if ansible_os_family == 'Debian' else 'redis' }}"
+        state: restarted

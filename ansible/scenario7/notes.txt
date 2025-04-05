@@ -1,0 +1,11 @@
+#create file to encrypt password by ansible-vault
+
+ansible-vault create redis-password.yml
+
+#in the redis-password.yml
+
+redis_password: "your password"
+
+#execute the playbook
+
+ansible-playbook -i inventory.ini playbook.yml --ask-vault-pass -vv

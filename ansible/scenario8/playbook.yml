@@ -1,0 +1,110 @@
+---
+- name: Install and configure PostgreSQL on Ubuntu 24 and Rocky Linux 9
+  hosts: hosts
+  become: yes
+  
+  tasks:
+    - name: Update package cache (Ubuntu 24)
+      apt:
+        update_cache: yes
+      when: ansible_os_family == "Debian"
+
+    - name: Install PostgreSQL on Ubuntu 24
+      apt:
+        name: postgresql
+        state: present
+      when: ansible_os_family == "Debian"
+
+    - name: Install PostgreSQL contrib on Ubuntu 24
+      apt:
+        name: postgresql-contrib
+        state: present
+      when: ansible_os_family == "Debian"
+
+    - name: Install PostgreSQL on Rocky Linux 9
+      dnf:
+        name: postgresql-server
+        state: present
+      when: ansible_os_family == "RedHat"
+
+    - name: Fetch PostgreSQL version (Ubuntu 24)
+      command: psql --version
+      register: postgresql_version_output
+      when: ansible_os_family == "Debian"
+      ignore_errors: yes
+
+    - name: Extract PostgreSQL major version from output (Ubuntu 24)
+      set_fact:
+        postgresql_version: "{{ postgresql_version_output.stdout | regex_search('([0-9]+)') }}"
+      when: ansible_os_family == "Debian"
+
+    - name: Set PostgreSQL data directory (Ubuntu 24)
+      set_fact:
+        postgresql_data_directory: "/var/lib/postgresql/{{ postgresql_version }}/main"
+      when: ansible_os_family == "Debian"
+
+    - name: Set PostgreSQL data directory (Rocky Linux 9)
+      set_fact:
+        postgresql_data_directory: "/var/lib/pgsql/data"
+      when: ansible_os_family == "RedHat"
+
+    - name: Fix permissions on /var/lib/pgsql (Rocky Linux 9)
+      file:
+        path: /var/lib/pgsql
+        state: directory
+        recurse: yes
+        owner: postgres
+        group: postgres
+        mode: '0700'
+      when: ansible_os_family == "RedHat"
+
+    - name: Ensure PostgreSQL data directory is absent (Rocky Linux 9)
+      file:
+        path: "{{ postgresql_data_directory }}"
+        state: absent
+      when: ansible_os_family == "RedHat"
+
+    - name: Initialize PostgreSQL database on Rocky Linux 9
+      command: postgresql-setup --initdb
+      when: ansible_os_family == "RedHat"
+
+    - name: Start and enable PostgreSQL service
+      service:
+        name: postgresql
+        state: started
+        enabled: yes
+
+    - name: Debug PostgreSQL data directory
+      debug:
+        msg: "PostgreSQL data directory: {{ postgresql_data_directory }}"
+
+    - name: Deploy PostgreSQL configuration file using template
+      template:
+        src: template/postgresql.conf.j2
+        dest: "{{ postgresql_data_directory }}/postgresql.conf"
+        owner: postgres
+        group: postgres
+        mode: '0644'
+      notify: Restart PostgreSQL
+
+    - name: Allow port using iptables (Ubuntu 24)
+      iptables:
+        chain: INPUT
+        protocol: tcp
+        destination_port: "{{ postgresql_port }}"
+        jump: ACCEPT
+      when: ansible_os_family == "Debian"
+
+    - name: Allow port using firewalld (Rocky Linux 9)
+      firewalld:
+        service: postgresql
+        permanent: yes
+        state: enabled
+        immediate: yes
+      when: ansible_os_family == "RedHat"
+
+  handlers:
+    - name: Restart PostgreSQL
+      service:
+        name: postgresql
+        state: restarted

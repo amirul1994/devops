@@ -1,0 +1,100 @@
+# PostgreSQL Configuration File
+# Managed by Ansible
+
+#------------------------------------------------------------------------------
+# CONNECTIONS AND AUTHENTICATION
+#------------------------------------------------------------------------------
+
+# Listen on all interfaces or specific addresses
+listen_addresses = {{ postgresql_listen_addresses }}
+
+# Port number for PostgreSQL
+port = {{ postgresql_port }}
+
+# Maximum number of concurrent connections
+max_connections = {{ postgresql_max_connections }}
+
+#------------------------------------------------------------------------------
+# RESOURCE USAGE (except WAL)
+#------------------------------------------------------------------------------
+
+# Memory allocated for shared buffers
+shared_buffers = {{ postgresql_shared_buffers }}
+
+# Logging directory
+log_directory = '{{ postgresql_log_directory }}'
+
+# Type of dynamic shared memory
+dynamic_shared_memory_type = posix
+
+#------------------------------------------------------------------------------
+# WRITE AHEAD LOG (WAL)
+#------------------------------------------------------------------------------
+
+# WAL level (minimal, replica, or logical)
+wal_level = replica
+
+# Synchronous commit behavior
+synchronous_commit = on
+
+#------------------------------------------------------------------------------
+# REPLICATION
+#------------------------------------------------------------------------------
+
+# Maximum number of replication slots
+max_replication_slots = 0
+
+# Maximum number of WAL senders
+max_wal_senders = 3
+
+#------------------------------------------------------------------------------
+# QUERY TUNING
+#------------------------------------------------------------------------------
+
+# Work memory for each query
+work_mem = '4MB'
+
+# Maintenance work memory
+maintenance_work_mem = '64MB'
+
+#------------------------------------------------------------------------------
+# LOGGING
+#------------------------------------------------------------------------------
+
+# Enable logging of connections
+log_connections = off
+
+# Enable logging of disconnections
+log_disconnections = off
+
+# Log duration of each completed statement
+log_duration = off
+
+# Log statements matching a specific pattern
+log_statement = 'none'
+
+#------------------------------------------------------------------------------
+# AUTOVACUUM
+#------------------------------------------------------------------------------
+
+# Enable autovacuum
+autovacuum = on
+
+# Autovacuum maximum workers
+autovacuum_max_workers = 3
+
+# Autovacuum vacuum cost limit
+autovacuum_vacuum_cost_limit = -1
+
+#------------------------------------------------------------------------------
+# CLIENT CONNECTION DEFAULTS
+#------------------------------------------------------------------------------
+
+# Default timezone
+timezone = 'UTC'
+
+# Statement timeout
+statement_timeout = 0
+
+# Idle in transaction session timeout
+idle_in_transaction_session_timeout = 0

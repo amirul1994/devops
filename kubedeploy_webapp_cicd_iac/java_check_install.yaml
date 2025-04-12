@@ -1,0 +1,95 @@
+- name: check or install java and maven
+  hosts: localhost
+  become: no
+  tasks:
+    - name: current directory
+      command: pwd
+      register: current_directory
+    
+    - name: print current directory
+      debug:
+        msg: "{{ current_directory.stdout }}"
+
+    - name: determine user
+      set_fact:
+        executive_user: >-
+          {{
+              (ansible_connection == 'local') | ternary(ansible_env.USER, ansible_user)
+          }}
+    
+    - name: show user
+      debug:
+        msg: "User is {{ executive_user }}"
+
+    
+    - name: create bash script for java version
+      copy:
+        content: |
+          #!/bin/bash
+
+          java_version=$(sudo apt list --installed 2> /dev/null | grep -E '^openjdk|^OpenJdk')
+
+          if [[ -n "$java_version" ]]; then
+              java_version=$(java --version | awk 'NR==1 && (/^openjdk/ || /^OpenJdk/)')
+              echo $java_version
+          fi
+        dest: "{{ current_directory.stdout }}/check_java_version.sh"
+        owner: "{{ executive_user }}"
+        group: "{{ executive_user }}"
+        mode: '0700'
+      become: yes
+    
+    - name: check java version
+      shell: >
+        "{{ current_directory.stdout }}/check_java_version.sh"
+      register: java_version
+
+    - name: show java version or install java
+      block:
+        - name: show java version
+          debug:
+            msg: "Java version is {{ java_version.stdout }}" 
+          when: java_version.stdout | length > 0
+        
+        - name: install java
+          apt:
+            name: openjdk-21-jdk
+            update_cache: yes
+          become: yes
+          when: java_version.stdout | length == 0
+        
+        - name: check maven version
+          shell: >
+            apt list -a maven 2> /dev/null | awk '/3.8*/'
+          register: maven_version
+          become: yes
+
+        - name: install maven
+          apt:
+            name: maven
+          become: yes
+          when: maven_version.stdout | length > 0 
+        
+        - name: install maven using binary
+          shell: >
+            wget https://dlcdn.apache.org/maven/maven-3/3.8.8/binaries/apache-maven-3.8.8-bin.tar.gz
+          when: maven_version.stdout | length == 0
+        
+        - name: present directory
+          command: pwd
+          register: download_directory
+          when: maven_version.stdout | length == 0
+
+        - name: remote source value
+          set_fact:
+            rmt_src_val: >-
+              {{
+                false if ((ansible_connection == 'local') and maven_version.stdout | length == 0) else true
+              }}
+        
+        - name: extract maven binary
+          unarchive:
+            src: "{{ download_directory.stdout }}/apache-maven-3.8.8-bin.tar.gz"
+            dest: /opt/
+            remote_src: "{{ rmt_src_val }}"
+          when: maven_version.stdout | length == 0

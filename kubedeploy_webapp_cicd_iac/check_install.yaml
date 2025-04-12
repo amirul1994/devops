@@ -30,8 +30,8 @@
           become: yes
           file:
             path: "{{ download_directory.stdout }}/install.sh"
-            owner: "{{ ansible_user }}"
-            group: "{{ ansible_user }}"
+            owner: "{{ ansible_env.USER }}"
+            group: "{{ ansible_env.USER }}"
             mode: '0700'
 
         - name: install nvm
@@ -48,6 +48,8 @@
           become: yes
           
       when: node_version.stdout | length == 0
+
+########
 
 - name: check or install python3 for flask
   hosts: localhost
@@ -74,18 +76,54 @@
       become: yes
       when: python3_version.stdout | length == 0
 
-- name: check or install java and springboot
+###########
+
+- name: check or install java and maven
   hosts: localhost
   become: no
   tasks:
+    - name: current directory
+      command: pwd
+      register: current_directory
+    
+    - name: print current directory
+      debug:
+        msg: "{{ current_directory.stdout }}"
+
+    - name: determine user
+      set_fact:
+        executive_user: >-
+          {{
+              (ansible_connection == 'local') | ternary(ansible_env.USER, ansible_user)
+          }}
+    
+    - name: show user
+      debug:
+        msg: "User is {{ executive_user }}"
+
+    
+    - name: create bash script for java version
+      copy:
+        content: |
+          #!/bin/bash
+
+          java_version=$(sudo apt list --installed 2> /dev/null | grep -E '^openjdk|^OpenJdk')
+
+          if [[ -n "$java_version" ]]; then
+              java_version=$(java --version | awk 'NR==1 && (/^openjdk/ || /^OpenJdk/)')
+              echo $java_version
+          fi
+        dest: "{{ current_directory.stdout }}/check_java_version.sh"
+        owner: "{{ executive_user }}"
+        group: "{{ executive_user }}"
+        mode: '0700'
+      become: yes
+    
     - name: check java version
       shell: >
-        java --version | awk 'NR==1'
+        "{{ current_directory.stdout }}/check_java_version.sh"
       register: java_version
-      ignore_errors: yes
-      args:
-        executable: /bin/bash 
-    
+
     - name: show java version or install java
       block:
         - name: show java version
@@ -97,5 +135,5 @@
           apt:
             name: openjdk-21-jdk
             update_cache: yes
+          become: yes
           when: java_version.stdout | length == 0
-

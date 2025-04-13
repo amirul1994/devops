@@ -1,0 +1,27 @@
+- name: check or install dotnet
+  hosts: localhost
+  become: no
+  tasks:
+    - name: check dotnet version
+      shell: >
+        dotnet --version 2> /dev/null || echo $?
+      register: dotnet_version
+      args:
+        executable: /bin/bash
+    
+    - name: print exit code
+      debug:
+        msg: "exit code is {{ dotnet_version.stdout }}"
+      when: dotnet_version.rc != 0
+    
+    - name: print dotnet version
+      debug:
+        msg: "dotnet version is {{ dotnet_version.stdout }}"
+      when: dotnet_version.rc == 0
+    
+    - name: install dotnet 
+      apt:
+        name: dotnet-sdk-8.0
+        update_cache: yes
+      become: yes
+      when: dotnet_version.stdout | regex_search('^127$')

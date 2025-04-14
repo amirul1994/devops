@@ -1,0 +1,3 @@
+Master nodes are: ['kubesinglemaster']
+Worker nodes are: ['ksmw1', 'kubesinglemasternode2']
+Namespaces are: ['default', 'kube-node-lease', 'kube-public', 'kube-system']

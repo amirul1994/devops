@@ -1,0 +1,139 @@
+- name: deploy argocd in kuberentes
+  hosts: ksm
+  become: no
+  
+  tasks:
+    - name: install python3, pip and python kuberentes library 
+      apt:
+        name:
+          - python3
+          - python3-pip
+          - python3-kubernetes
+        state: present
+        update_cache: yes
+      become: yes
+    
+    # - name: get kubernetes cluster info
+    #   kubernetes.core.k8s_cluster_info:
+    #   register: cluster_info
+    
+    # - name: show kubernetes cluster info
+    #   debug:
+    #     msg: "{{ cluster_info}}"
+
+    # - name: kubernetes node
+    #   kubernetes.core.k8s_info:
+    #     kind: Node
+    #   register: node_info
+    
+    # - name: kubernetes node info
+    #   debug:
+    #     msg: "{{ node_info.resources }}"
+
+    - name: kubernetes node
+      kubernetes.core.k8s_info:
+        kind: Node
+      register: node_info
+    
+    - name: show node info
+      debug:
+        msg: "{{ node_info.resources }}"
+    
+    - name: current directory
+      command: pwd
+      register: current_directory
+    
+    - name: save node info
+      copy:
+        content: "{{ node_info.resources | to_nice_yaml }}"
+        dest: "{{ current_directory.stdout }}/node_info.yaml"
+    
+    
+    - name: Set master nodes
+      set_fact:
+        master_nodes: >-
+          {{ node_info.resources
+             | selectattr('metadata.labels', 'defined')
+             | selectattr('metadata.labels', 'search', 'node-role.kubernetes.io/control-plane')
+             | map(attribute='metadata.name')
+             | list }}
+
+    
+    - name: Set worker nodes
+      set_fact:
+        worker_nodes: >-
+          {{ node_info.resources
+             | selectattr('metadata.labels', 'defined')
+             | rejectattr('metadata.labels', 'search', 'node-role.kubernetes.io/control-plane')
+             | map(attribute='metadata.name')
+             | list }}
+
+    - name: Show master nodes
+      ansible.builtin.debug:
+        msg: "master nodes: {{ master_nodes }}"
+
+    - name: Show worker nodes
+      ansible.builtin.debug:
+        msg: "worker nodes: {{ worker_nodes }}"
+
+
+    - name: kubernetes namespace
+      kubernetes.core.k8s_info:
+        kind: Namespace
+      register: namespace_info
+      
+    - name: show kubernetes namesapce info
+      set_fact:
+        namespaces: >
+          {{ namespace_info.resources | map(attribute='metadata.name') | list }}
+    
+    - name: show namespaces
+      debug:
+        msg: "namespaces: {{ namespaces }}"
+
+######
+
+- name: run python for kubernetes cluster nodes and namespaces
+  hosts: localhost
+  become: no
+  tasks:
+    - name: current directory
+      command: pwd
+      register: current_directory
+    
+    - name: copy master node names
+      lineinfile:
+        path: "{{ current_directory.stdout }}/kube_info.py"
+        line: mn = {'master_nodes':{{ hostvars['ksm']['master_nodes'] }}}
+        create: yes
+    
+    - name: copy worker node names
+      lineinfile:
+        path: "{{ current_directory.stdout }}/kube_info.py"
+        line: wn = {'worker_nodes':{{ hostvars['ksm']['worker_nodes'] }}}
+        create: yes
+    
+    - name: copy namespace names
+      lineinfile:
+        path: "{{ current_directory.stdout }}/kube_info.py"
+        line: nsp = {'namespaces':{{ hostvars['ksm']['namespaces']}}}
+        create: yes
+    
+    - name: add other lines
+      lineinfile:
+        path: "{{ current_directory.stdout }}/kube_info.py"
+        line: |
+          with open('kuebernetes_nodes_namespaces.txt', 'w') as f:
+              f.write(f"Master nodes are: {mn['master_nodes']}\n")
+              f.write(f"Worker nodes are: {wn['worker_nodes']}\n")
+              f.write(f"Namespaces are: {nsp['namespaces']}\n")
+        create: yes
+    
+    - name: run python script
+      command: python3 "{{ current_directory.stdout }}/kube_info.py"
+      register: kubernetes_nodes_namespaces
+    
+    - name: delete kube_info.py
+      file: 
+        name: kube_info.py
+        state: absent

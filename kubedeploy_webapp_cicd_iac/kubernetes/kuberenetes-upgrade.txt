@@ -122,6 +122,23 @@ Here’s a concise **note** summarizing the Kubernetes upgrade process from **v1
    - Missing GPG keys: Resolved by importing the correct key (`curl -fsSL ... | sudo gpg --dearmor ...`) [[1]].
    - Network plugin issues: Restart or reapply the manifest if pods fail to schedule [[2]].
 
+5. ### Error
+
+W0413 15:09:42.893542  105155 checks.go:846 detected that the sandbox image "registry.k8s.io/pause:3.6" of the container runtime is inconsistent with that used by kubeadm.
+It is recommended to use "registry.k8s.io/pause:3.10" as the CRI sandbox image.
+
+### Solution
+
+sudo vim /etc/containerd/config.toml
+
+[plugins."io.containerd.grpc.v1.cri"]
+  sandbox_image = "registry.k8s.io/pause:3.10"
+
+sudo systemctl restart containerd
+
+You ensured the new sandbox image was in use by pulling it manually (if needed):
+
+sudo crictl pull registry.k8s.io/pause:3.10
 ---
 
 ### **Final Outcome**

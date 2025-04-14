@@ -1,0 +1,130 @@
+Here’s a concise **note** summarizing the Kubernetes upgrade process from **v1.30 → v1.31 → v1.32**, based on the steps you followed:
+
+---
+
+### **Kubernetes Upgrade Summary**
+
+#### **Environment**
+- **Operating System**: Ubuntu 24.04 (or similar).
+- **Cluster Nodes**:
+  - **Master Node**: `kubesinglemaster`.
+  - **Worker Nodes**: `ksmw1`, `kubesinglemasternode2`.
+
+---
+
+### **Upgrade Process**
+
+#### **1. Upgrade from v1.30 to v1.31**
+- **Step 1: Update the Kubernetes Repository**  
+  Added the **v1.31 repository** and imported the GPG key:
+  ```bash
+  sudo apt-mark unhold kubeadm kubelet kubectl
+  echo "deb [signed-by=/etc/apt/trusted.gpg.d/kubernetes.gpg] https://pkgs.k8s.io/core:/stable:/v1.31/deb/ /" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+  curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.31/deb/Release.key | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/kubernetes.gpg
+  ```
+
+- **Step 2: Upgrade the Master Node**  
+  Upgraded `kubeadm` and applied the control plane update:
+  ```bash
+  sudo apt install -y kubeadm=1.31.0-1.1 --allow-change-held-packages
+  sudo kubeadm upgrade apply v1.31.0
+  ```
+  Then upgraded `kubelet` and `kubectl`:
+  ```bash
+  sudo apt install -y kubelet=1.31.0-1.1 kubectl=1.31.0-1.1 --allow-change-held-packages
+  sudo systemctl restart kubelet
+  ```
+
+- **Step 3: Upgrade Worker Nodes**  
+  For each worker node (`ksmw1`, `kubesinglemasternode2`):
+  - Drained the node:
+    ```bash
+    kubectl drain <node-name> --ignore-daemonsets --delete-emptydir-data
+    ```
+  - Updated `kubeadm` and upgraded the kubelet configuration:
+    ```bash
+    sudo apt install -y kubeadm=1.31.0-1.1 --allow-change-held-packages
+    sudo kubeadm upgrade node
+    ```
+  - Upgraded `kubelet` and `kubectl`:
+    ```bash
+    sudo apt install -y kubelet=1.31.0-1.1 kubectl=1.31.0-1.1 --allow-change-held-packages
+    sudo systemctl restart kubelet
+    ```
+  - Uncordoned the node:
+    ```bash
+    kubectl uncordon <node-name>
+    ```
+
+---
+
+#### **2. Upgrade from v1.31 to v1.32**
+- **Step 1: Update the Kubernetes Repository**  
+  Switched to the **v1.32 repository** and imported the GPG key:
+  ```bash
+  echo "deb [signed-by=/etc/apt/trusted.gpg.d/kubernetes.gpg] https://pkgs.k8s.io/core:/stable:/v1.32/deb/ /" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+  curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/kubernetes.gpg
+  ```
+
+- **Step 2: Upgrade the Master Node**  
+  Upgraded `kubeadm` and applied the control plane update:
+  ```bash
+  sudo apt install -y kubeadm=1.32.3-1.1 --allow-change-held-packages
+  sudo kubeadm upgrade apply v1.32.3
+  ```
+  Then upgraded `kubelet` and `kubectl`:
+  ```bash
+  sudo apt install -y kubelet=1.32.3-1.1 kubectl=1.32.3-1.1 --allow-change-held-packages
+  sudo systemctl restart kubelet
+  ```
+  sudo apt-mark hold kubeadm kubelet kubectl
+
+- **Step 3: Upgrade Worker Nodes**  
+  Repeated the same steps as in the v1.31 upgrade for each worker node:
+  - Drain the node:
+    ```bash
+    kubectl drain <node-name> --ignore-daemonsets --delete-emptydir-data
+    ```
+  - Update `kubeadm` and upgrade the kubelet configuration:
+    ```bash
+    sudo apt install -y kubeadm=1.32.3-1.1 --allow-change-held-packages
+    sudo kubeadm upgrade node
+    ```
+  - Upgrade `kubelet` and `kubectl`:
+    ```bash
+    sudo apt install -y kubelet=1.32.3-1.1 kubectl=1.32.3-1.1 --allow-change-held-packages
+    sudo systemctl restart kubelet
+    ```
+  - Uncordon the node:
+    ```bash
+    kubectl uncordon <node-name>
+    ```
+   sudo apt-mark hold kubeadm kubelet kubectl
+---
+
+### **Key Notes**
+1. **Version Skew Policy**:
+   - Kubernetes supports a maximum skew of **two minor versions** between the control plane and worker nodes [[6]].
+   - Always upgrade one minor version at a time (e.g., `v1.30 → v1.31 → v1.32`) [[9]].
+
+2. **Pre-Upgrade Checks**:
+   - Back up etcd data and cluster resources (`kubectl get all --all-namespaces -o yaml > backup.yaml`) [[5]].
+   - Verify compatibility of container runtime (e.g., `containerd`) and network plugins (e.g., Calico) with the target version [[7]][[9]].
+
+3. **Post-Upgrade Verification**:
+   - Check node status:
+     ```bash
+     kubectl get nodes
+     ```
+   - Ensure all nodes report the upgraded version (e.g., `v1.32.3`) [[9]].
+
+4. **Common Issues**:
+   - Missing GPG keys: Resolved by importing the correct key (`curl -fsSL ... | sudo gpg --dearmor ...`) [[1]].
+   - Network plugin issues: Restart or reapply the manifest if pods fail to schedule [[2]].
+
+---
+
+### **Final Outcome**
+The Kubernetes cluster was successfully upgraded from **v1.30 → v1.31 → v1.32** on both the master and worker nodes. The `kubectl get nodes` command confirmed that all nodes are running **v1.32.3**, ensuring compatibility and stability across the cluster.
+
+For more details, refer to the official [kubeadm upgrade guide](https://kubernetes.io/docs/tasks/administer-cluster/kubeadm/kubeadm-upgrade/) [[9]].

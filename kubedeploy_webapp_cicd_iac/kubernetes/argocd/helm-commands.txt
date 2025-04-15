@@ -1,0 +1,198 @@
+Here are some essential **Helm commands** that are commonly used for managing Helm charts and releases in Kubernetes:
+
+---
+
+### **1. Adding and Managing Repositories**
+- **Add a Helm repository**:
+  ```bash
+  helm repo add <repo-name> <repository-url>
+  ```
+  Example:
+  ```bash
+  helm repo add argo https://argoproj.github.io/argo-helm
+  ```
+
+- **List all added repositories**:
+  ```bash
+  helm repo list
+  ```
+
+- **Update the repository cache** (fetch the latest chart versions):
+  ```bash
+  helm repo update
+  ```
+
+- **Remove a repository**:
+  ```bash
+  helm repo remove <repo-name>
+  ```
+
+---
+
+### **2. Searching for Charts**
+- **Search for charts in all repositories**:
+  ```bash
+  helm search repo <chart-name>
+  ```
+  Example:
+  ```bash
+  helm search repo argo-cd
+  ```
+
+- **Search for charts with a specific keyword**:
+  ```bash
+  helm search repo <keyword>
+  ```
+
+---
+
+### **3. Installing and Upgrading Releases**
+- **Install a chart**:
+  ```bash
+  helm install <release-name> <chart-name>
+  ```
+  Example:
+  ```bash
+  helm install my-argocd argo/argo-cd --namespace argocd --create-namespace
+  ```
+
+- **Upgrade a release**:
+  ```bash
+  helm upgrade <release-name> <chart-name>
+  ```
+  Example:
+  ```bash
+  helm upgrade my-argocd argo/argo-cd --namespace argocd
+  ```
+
+- **Install or Upgrade a release (idempotent)**:
+  ```bash
+  helm upgrade --install <release-name> <chart-name>
+  ```
+  Example:
+  ```bash
+  helm upgrade --install my-argocd argo/argo-cd --namespace argocd --create-namespace
+  ```
+
+---
+
+### **4. Listing and Inspecting Releases**
+- **List all releases**:
+  ```bash
+  helm list
+  ```
+
+- **List releases in a specific namespace**:
+  ```bash
+  helm list --namespace <namespace>
+  ```
+
+- **Inspect a release's status**:
+  ```bash
+  helm status <release-name> --namespace <namespace>
+  ```
+
+- **Inspect the values of a release**:
+  ```bash
+  helm get values <release-name> --namespace <namespace>
+  ```
+
+---
+
+### **5. Uninstalling Releases**
+- **Uninstall a release**:
+  ```bash
+  helm uninstall <release-name> --namespace <namespace>
+  ```
+  Example:
+  ```bash
+  helm uninstall my-argocd --namespace argocd
+  ```
+
+---
+
+### **6. Working with Chart Files**
+- **Create a new Helm chart**:
+  ```bash
+  helm create <chart-name>
+  ```
+  Example:
+  ```bash
+  helm create my-chart
+  ```
+
+- **Lint a chart for errors**:
+  ```bash
+  helm lint <chart-directory>
+  ```
+
+- **Package a chart into a `.tgz` file**:
+  ```bash
+  helm package <chart-directory>
+  ```
+
+---
+
+### **7. Pulling and Inspecting Charts**
+- **Pull a chart to your local machine**:
+  ```bash
+  helm pull <chart-name> --untar
+  ```
+  Example:
+  ```bash
+  helm pull argo/argo-cd --untar
+  ```
+
+- **Inspect the chart's `values.yaml` file**:
+  ```bash
+  helm show values <chart-name>
+  ```
+
+- **Inspect the chart's README**:
+  ```bash
+  helm show readme <chart-name>
+  ```
+
+---
+
+### **8. Debugging Commands**
+- **Dry-run an installation/upgrade** (simulate without applying changes):
+  ```bash
+  helm install <release-name> <chart-name> --dry-run --debug
+  ```
+
+- **Template the rendered Kubernetes manifests**:
+  ```bash
+  helm template <release-name> <chart-name>
+  ```
+
+- **Rollback to a previous release version**:
+  ```bash
+  helm rollback <release-name> <revision-number>
+  ```
+
+---
+
+### **9. Managing Secrets**
+- **Encrypt secrets using Helm Secrets plugin** (if installed):
+  ```bash
+  helm secrets enc <path-to-values-file>
+  ```
+
+- **Decrypt secrets**:
+  ```bash
+  helm secrets dec <path-to-values-file>
+  ```
+
+---
+
+### **10. Miscellaneous Commands**
+- **Check Helm version**:
+  ```bash
+  helm version
+  ```
+
+- **View help for any Helm command**:
+  ```bash
+  helm <command> --help
+  ```

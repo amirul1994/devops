@@ -5,7 +5,12 @@ kubectl create namespace argocd
 
 helm install argocd argo/argo-cd --namespace argocd --create-namespace
 
+kubectl edit svc argocd-server -n argocd
+
+Or
+
 kubectl get service argocd-server -n argocd -o yaml > argocd-server.yaml
+
 
 edit it as follows
 
@@ -36,3 +41,12 @@ spec:
 
 
 kubectl get service argocd-server -n argocd
+
+
+
+helm upgrade argocd argo/argo-cd --namespace argocd
+
+the following command causes problem due to unsupported kubernetes version
+helm upgrade argocd argo/argo-cd --namespace argocd -f values.yaml
+
+may face issue as argocd 2.14 is still not supported on kubernetes 1.32

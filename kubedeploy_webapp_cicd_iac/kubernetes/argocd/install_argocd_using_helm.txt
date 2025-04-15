@@ -1,0 +1,38 @@
+helm repo add argo https://argoproj.github.io/argo-helm
+helm repo update
+
+kubectl create namespace argocd
+
+helm install argocd argo/argo-cd --namespace argocd --create-namespace
+
+kubectl get service argocd-server -n argocd -o yaml > argocd-server.yaml
+
+edit it as follows
+
+spec:
+  clusterIP: 10.111.222.169
+  clusterIPs:
+  - 10.111.222.169
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 8080
+    nodePort: 30000
+  - name: https
+    port: 443
+    protocol: TCP
+    targetPort: 8080
+    nodePort: 30001
+  selector:
+    app.kubernetes.io/instance: argocd
+    app.kubernetes.io/name: argocd-server
+  sessionAffinity: None
+  type: NodePort
+
+
+kubectl get service argocd-server -n argocd

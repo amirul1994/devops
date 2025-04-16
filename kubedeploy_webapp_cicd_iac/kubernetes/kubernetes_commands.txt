@@ -1,0 +1,387 @@
+`jsonpath` is a powerful feature in Kubernetes that allows  to extract specific information from the JSON output of `kubectl` commands. Below is a list of example commands using `jsonpath` to extract various types of information such as image names, taints, labels, events, and more.
+
+---
+
+### **1. Extract Image Name(s) from Pods**
+Extract the container image names used in all pods in a namespace:
+```bash
+kubectl get pods -n argocd-namespace -o jsonpath='{.items[*].spec.containers[*].image}'
+```
+
+---
+
+### **2. Extract Pod Names with Specific Labels**
+Extract the names of pods that have a specific label (e.g., `app=argocd`):
+```bash
+kubectl get pods -n argocd-namespace -o jsonpath='{.items[?(@.metadata.labels.app=="argocd")].metadata.name}'
+```
+
+---
+
+### **3. Extract Node Taints**
+Extract the taints applied to all nodes in the cluster:
+```bash
+kubectl get nodes -o jsonpath='{.items[*].spec.taints}'
+```
+
+---
+
+### **4. Extract Events for a Specific Pod**
+Extract all events related to a specific pod (e.g., `argocd-deployment-6cb64677dc-jmwk4`):
+```bash
+kubectl get events -n argocd-namespace --field-selector involvedObject.name=argocd-deployment-6cb64677dc-jmwk4 -o jsonpath='{.items[*].message}'
+```
+
+---
+
+### **5. Extract Resource Requests and Limits**
+Extract the CPU and memory requests/limits for all containers in a deployment:
+```bash
+kubectl get deployment argocd-deployment -n argocd-namespace -o jsonpath='{.spec.template.spec.containers[*].resources}'
+```
+
+---
+
+### **6. Extract Pod IP Addresses**
+Extract the IP addresses of all pods in a namespace:
+```bash
+kubectl get pods -n argocd-namespace -o jsonpath='{.items[*].status.podIP}'
+```
+
+---
+
+### **7. Extract Service Account Names**
+Extract the service account names used by all pods in a namespace:
+```bash
+kubectl get pods -n argocd-namespace -o jsonpath='{.items[*].spec.serviceAccount}'
+```
+
+---
+
+### **8. Extract Node Names with Specific Labels**
+Extract the names of nodes that have a specific label (e.g., `node-role.kubernetes.io/master`):
+```bash
+kubectl get nodes -o jsonpath='{.items[?(@.metadata.labels."node-role\.kubernetes\.io/master"=="")].metadata.name}'
+```
+
+---
+
+### **9. Extract Namespace Names**
+Extract the names of all namespaces in the cluster:
+```bash
+kubectl get namespaces -o jsonpath='{.items[*].metadata.name}'
+```
+
+---
+
+### **10. Extract Pod Conditions**
+Extract the conditions (e.g., `Ready`, `PodScheduled`) for a specific pod:
+```bash
+kubectl get pod argocd-deployment-6cb64677dc-jmwk4 -n argocd-namespace -o jsonpath='{.status.conditions[*].type}'
+```
+
+---
+
+### **11. Extract Persistent Volume Claims (PVCs)**
+Extract the names of PVCs in a namespace:
+```bash
+kubectl get pvc -n argocd-namespace -o jsonpath='{.items[*].metadata.name}'
+```
+
+---
+
+### **12. Extract Secrets Used by Pods**
+Extract the secrets mounted as volumes in a specific pod:
+```bash
+kubectl get pod argocd-deployment-6cb64677dc-jmwk4 -n argocd-namespace -o jsonpath='{.spec.volumes[?(@.secret)].name}'
+```
+
+---
+
+### **13. Extract Node Allocatable Resources**
+Extract the allocatable CPU and memory resources for all nodes:
+```bash
+kubectl get nodes -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.status.allocatable.cpu}{"\t"}{.status.allocatable.memory}{"\n"}{end}'
+```
+
+---
+
+### **14. Extract Pod Restart Counts**
+Extract the restart counts for all containers in a specific pod:
+```bash
+kubectl get pod argocd-deployment-6cb64677dc-jmwk4 -n argocd-namespace -o jsonpath='{.status.containerStatuses[*].restartCount}'
+```
+
+---
+
+### **15. Extract All Annotations for a Pod**
+Extract all annotations for a specific pod:
+```bash
+kubectl get pod argocd-deployment-6cb64677dc-jmwk4 -n argocd-namespace -o jsonpath='{.metadata.annotations}'
+```
+
+---
+
+### **16. Extract Event Reasons**
+Extract the reasons for all events in a namespace:
+```bash
+kubectl get events -n argocd-namespace -o jsonpath='{.items[*].reason}'
+```
+
+---
+
+### **17. Extract Deployment Replicas**
+Extract the desired, current, and ready replicas for a deployment:
+```bash
+kubectl get deployment argocd-deployment -n argocd-namespace -o jsonpath='{.status.replicas} {.status.readyReplicas} {.status.availableReplicas}'
+```
+
+---
+
+### **18. Extract Container Names**
+Extract the names of all containers in a specific pod:
+```bash
+kubectl get pod argocd-deployment-6cb64677dc-jmwk4 -n argocd-namespace -o jsonpath='{.spec.containers[*].name}'
+```
+
+---
+
+### **19. Extract Node Internal IPs**
+Extract the internal IP addresses of all nodes:
+```bash
+kubectl get nodes -o jsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}'
+```
+
+---
+
+### **20. Extract Role Bindings**
+Extract the names of role bindings in a namespace:
+```bash
+kubectl get rolebindings -n argocd-namespace -o jsonpath='{.items[*].metadata.name}'
+```
+
+---
+
+### **21. Extract ConfigMap Data**
+Extract the data keys from a specific ConfigMap:
+```bash
+kubectl get configmap <configmap-name> -n argocd-namespace -o jsonpath='{.data}'
+```
+
+---
+
+### **22. Extract Service Ports**
+Extract the ports exposed by a specific service:
+```bash
+kubectl get service <service-name> -n argocd-namespace -o jsonpath='{.spec.ports[*].port}'
+```
+
+---
+
+### **23. Extract Pod Phase**
+Extract the phase (e.g., `Running`, `Pending`) of a specific pod:
+```bash
+kubectl get pod argocd-deployment-6cb64677dc-jmwk4 -n argocd-namespace -o jsonpath='{.status.phase}'
+```
+
+---
+
+### **24. Extract Node Roles**
+Extract the roles of all nodes (e.g., `master`, `worker`):
+```bash
+kubectl get nodes -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.metadata.labels}{"\n"}{end}' | grep -E 'node-role|kubernetes.io/role'
+```
+
+
+In addition to `jsonpath`, Kubernetes provides several other ways to extract or format information from its resources. Below is a list of alternative methods and tools, along with examples of how they can be used:
+
+---
+
+### **1. `go-template`**
+Kubernetes supports Go templating (`go-template`) for formatting output. This is particularly useful for creating custom outputs.
+
+#### **Example: Extract Pod Names**
+```bash
+kubectl get pods -n argocd-namespace -o go-template='{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}'
+```
+
+#### **Example: Extract Container Images**
+```bash
+kubectl get pods -n argocd-namespace -o go-template='{{range .items}}{{range .spec.containers}}{{.image}}{{"\n"}}{{end}}{{end}}'
+```
+
+---
+
+### **2. `custom-columns`**
+The `custom-columns` option allows you to define custom columns for output.
+
+#### **Example: Show Pod Name and Namespace**
+```bash
+kubectl get pods -n argocd-namespace -o custom-columns=POD_NAME:.metadata.name,NAMESPACE:.metadata.namespace
+```
+
+#### **Example: Show Pod Name and Node**
+```bash
+kubectl get pods -n argocd-namespace -o custom-columns=POD_NAME:.metadata.name,NODE:.spec.nodeName
+```
+
+---
+
+### **3. `yaml`**
+The `yaml` output format provides a detailed view of the resource in YAML format. You can use this to inspect specific fields.
+
+#### **Example: Get Pod Details in YAML**
+```bash
+kubectl get pod argocd-deployment-6cb64677dc-jmwk4 -n argocd-namespace -o yaml
+```
+
+#### **Example: Extract Specific Field Using `grep`**
+```bash
+kubectl get pod argocd-deployment-6cb64677dc-jmwk4 -n argocd-namespace -o yaml | grep -A 5 "status:"
+```
+
+---
+
+### **4. `wide`**
+The `wide` output format provides additional details such as node names and pod IPs.
+
+#### **Example: Show Pod Details with Node Information**
+```bash
+kubectl get pods -n argocd-namespace -o wide
+```
+
+---
+
+### **5. `name`**
+The `name` output format lists only the names of the resources.
+
+#### **Example: List All Pod Names**
+```bash
+kubectl get pods -n argocd-namespace -o name
+```
+
+---
+
+### **6. `jq` (External Tool)**
+If you pipe the JSON output of `kubectl` to `jq`, you can use `jq`'s powerful JSON processing capabilities.
+
+#### **Example: Extract Pod Names Using `jq`**
+```bash
+kubectl get pods -n argocd-namespace -o json | jq '.items[].metadata.name'
+```
+
+#### **Example: Extract Container Images Using `jq`**
+```bash
+kubectl get pods -n argocd-namespace -o json | jq '.items[].spec.containers[].image'
+```
+
+---
+
+### **7. `awk` and `grep` (Unix Tools)**
+You can use Unix tools like `awk` and `grep` to extract specific information from plain text or structured output.
+
+#### **Example: Extract Pod Names Using `awk`**
+```bash
+kubectl get pods -n argocd-namespace | awk '{print $1}'
+```
+
+#### **Example: Extract Pod IPs Using `grep`**
+```bash
+kubectl describe pods -n argocd-namespace | grep "Pod IP"
+```
+
+---
+
+### **8. `field-selector`**
+The `--field-selector` flag allows you to filter resources based on specific fields.
+
+#### **Example: List Pods Running on a Specific Node**
+```bash
+kubectl get pods -n argocd-namespace --field-selector spec.nodeName=kubesinglemasternode2
+```
+
+#### **Example: List Pods in CrashLoopBackOff State**
+```bash
+kubectl get pods -n argocd-namespace --field-selector status.phase=Running | grep CrashLoopBackOff
+```
+
+---
+
+### **9. `sort-by`**
+The `--sort-by` flag allows you to sort resources based on a specific field.
+
+#### **Example: Sort Pods by Restart Count**
+```bash
+kubectl get pods -n argocd-namespace --sort-by=.status.containerStatuses[0].restartCount
+```
+
+#### **Example: Sort Pods by Age**
+```bash
+kubectl get pods -n argocd-namespace --sort-by=.metadata.creationTimestamp
+```
+
+---
+
+### **10. `describe`**
+The `kubectl describe` command provides detailed information about a specific resource, including events and conditions.
+
+#### **Example: Describe a Pod**
+```bash
+kubectl describe pod argocd-deployment-6cb64677dc-jmwk4 -n argocd-namespace
+```
+
+#### **Example: Extract Events from `describe` Output**
+```bash
+kubectl describe pod argocd-deployment-6cb64677dc-jmwk4 -n argocd-namespace | grep -A 10 "Events:"
+```
+
+---
+
+### **11. `logs`**
+The `kubectl logs` command retrieves the logs of a container. You can use tools like `grep` to filter specific log messages.
+
+#### **Example: Get Logs for a Pod**
+```bash
+kubectl logs argocd-deployment-6cb64677dc-jmwk4 -n argocd-namespace
+```
+
+#### **Example: Filter Logs for Errors**
+```bash
+kubectl logs argocd-deployment-6cb64677dc-jmwk4 -n argocd-namespace | grep "ERROR"
+```
+
+---
+
+### **12. `top`**
+The `kubectl top` command shows resource usage (CPU and memory) for pods or nodes.
+
+#### **Example: Show Resource Usage for Pods**
+```bash
+kubectl top pods -n argocd-namespace
+```
+
+#### **Example: Show Resource Usage for Nodes**
+```bash
+kubectl top nodes
+```
+
+---
+
+### **Summary of Methods**
+| Method            | Use Case                                                                 |
+|--------------------|--------------------------------------------------------------------------|
+| `jsonpath`        | Extract specific fields from JSON output.                                |
+| `go-template`     | Create custom templates for output formatting.                          |
+| `custom-columns`  | Define custom columns for tabular output.                               |
+| `yaml`            | Inspect detailed resource information in YAML format.                    |
+| `wide`            | Include additional details like node names and pod IPs.                  |
+| `name`            | List only the names of resources.                                        |
+| `jq`              | Process JSON output using an external tool.                             |
+| `awk`/`grep`      | Extract specific information using Unix text processing tools.           |
+| `field-selector`  | Filter resources based on specific fields.                              |
+| `sort-by`         | Sort resources based on a specific field.                               |
+| `describe`        | Get detailed information about a resource, including events.             |
+| `logs`            | Retrieve logs from a container.                                          |
+| `top`             | Monitor resource usage (CPU/memory) for pods or nodes.                   |
+
+These methods provide flexibility depending on your needs, whether you're extracting specific data, formatting output, or debugging issues.

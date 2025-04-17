@@ -1,0 +1,138 @@
+### **Step 1: Configure the NFS Server (`192.168.0.50`)**
+
+1. **Install NFS Kernel Server**:
+   ```bash
+   sudo apt update
+   sudo apt install nfs-kernel-server -y
+   ```
+
+2. **Create the NFS Directory**:
+   ```bash
+   sudo mkdir -p /mnt/lvm_storage/devops/for_kube_pv
+   sudo chmod 777 /mnt/lvm_storage/devops/for_kube_pv  # Adjust permissions as needed
+   ```
+
+3. **Export the NFS Share**:
+   Edit `/etc/exports` to allow access from all Kubernetes nodes:
+   ```bash
+   sudo nano /etc/exports
+   ```
+   Add the following line:
+   ```bash
+   /mnt/lvm_storage/devops/for_kube_pv 192.168.0.18(rw,sync,no_subtree_check,no_root_squash) \
+                                      192.168.0.19(rw,sync,no_subtree_check,no_root_squash) \
+                                      192.168.0.20(rw,sync,no_subtree_check,no_root_squash)
+   ```
+
+4. **Reload NFS Configuration**:
+   ```bash
+   sudo exportfs -a
+   sudo systemctl restart nfs-kernel-server
+   ```
+
+5. **Configure Firewall Using `iptables`**:
+   Allow NFS traffic from the Kubernetes nodes by adding the following rules:
+   ```bash
+   sudo iptables -I INPUT -p tcp -s 192.168.0.18 --dport 2049 -j ACCEPT
+   sudo iptables -I INPUT -p udp -s 192.168.0.18 --dport 111 -j ACCEPT
+   sudo iptables -I INPUT -p tcp -s 192.168.0.18 --dport 111 -j ACCEPT
+   sudo iptables -I INPUT -p tcp -s 192.168.0.18 --dport 20048:20050 -j ACCEPT
+   sudo iptables -I INPUT -p udp -s 192.168.0.18 --dport 20048:20050 -j ACCEPT
+
+   sudo iptables -I INPUT -p tcp -s 192.168.0.19 --dport 2049 -j ACCEPT
+   sudo iptables -I INPUT -p udp -s 192.168.0.19 --dport 111 -j ACCEPT
+   sudo iptables -I INPUT -p tcp -s 192.168.0.19 --dport 111 -j ACCEPT
+   sudo iptables -I INPUT -p tcp -s 192.168.0.19 --dport 20048:20050 -j ACCEPT
+   sudo iptables -I INPUT -p udp -s 192.168.0.19 --dport 20048:20050 -j ACCEPT
+
+   sudo iptables -I INPUT -p tcp -s 192.168.0.20 --dport 2049 -j ACCEPT
+   sudo iptables -I INPUT -p udp -s 192.168.0.20 --dport 111 -j ACCEPT
+   sudo iptables -I INPUT -p tcp -s 192.168.0.20 --dport 111 -j ACCEPT
+   sudo iptables -I INPUT -p tcp -s 192.168.0.20 --dport 20048:20050 -j ACCEPT
+   sudo iptables -I INPUT -p udp -s 192.168.0.20 --dport 20048:20050 -j ACCEPT
+   ```
+
+6. **Persist `iptables` Rules Using `netfilter-persistent`**:
+   Install `netfilter-persistent` to save the rules:
+   ```bash
+   sudo apt install netfilter-persistent iptables-persistent -y
+   ```
+   Save the current `iptables` rules:
+   ```bash
+   sudo netfilter-persistent save
+   ```
+   Verify the rules are saved in `/etc/iptables/rules.v4`:
+   ```bash
+   cat /etc/iptables/rules.v4
+   ```
+
+---
+
+### **Step 2: Configure Kubernetes Nodes**
+
+#### **On Each Node (Master and Workers)**
+
+1. **Install NFS Client Utilities**:
+   ```bash
+   sudo apt update
+   sudo apt install nfs-common -y
+   ```
+
+2. **Create the Mount Point**:
+   ```bash
+   sudo mkdir -p /mnt/nfs
+   ```
+
+3. **Mount the NFS Share**:
+   ```bash
+   sudo mount -t nfs 192.168.0.50:/mnt/lvm_storage/devops/for_kube_pv /mnt/nfs
+   ```
+
+4. **Verify the Mount**:
+   ```bash
+   df -h | grep "/mnt/nfs"
+   ```
+   You should see output like:
+   ```
+   192.168.0.50:/mnt/lvm_storage/devops/for_kube_pv   30G  2.3G   26G   9% /mnt/nfs
+   ```
+
+5. **Automate the Mount in `/etc/fstab`**:
+   Edit `/etc/fstab`:
+   ```bash
+   sudo nano /etc/fstab
+   ```
+   Add the following line:
+   ```
+   192.168.0.50:/mnt/lvm_storage/devops/for_kube_pv /mnt/nfs nfs defaults 0 0
+   ```
+
+6. **Test the Configuration**:
+   ```bash
+   sudo mount -a
+   ```
+
+7. **Verify Again**:
+   ```bash
+   df -h | grep "/mnt/nfs"
+   ```
+
+---
+
+### **Step 3: Test Across All Nodes**
+
+1. On **one node**, create a test file:
+   ```bash
+   echo "Test file" | sudo tee /mnt/nfs/testfile.txt
+   ```
+
+2. On **another node**, verify the file:
+   ```bash
+   cat /mnt/nfs/testfile.txt
+   ```
+   You should see:
+   ```
+   Test file
+   ```
+
+This confirms that the NFS share is synchronized across all nodes.

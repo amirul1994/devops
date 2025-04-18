@@ -18,3 +18,5 @@
 .terraform.lock.hcl
 bfg-1.14.0.jar
 **/readme2.md
+
+for_kube_pv/

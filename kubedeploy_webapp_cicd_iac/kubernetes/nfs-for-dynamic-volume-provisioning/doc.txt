@@ -15,7 +15,7 @@
 3. **Export the NFS Share**:
    Edit `/etc/exports` to allow access from all Kubernetes nodes:
    ```bash
-   sudo nano /etc/exports
+   sudo vim /etc/exports
    ```
    Add the following line:
    ```bash
@@ -100,7 +100,7 @@
 5. **Automate the Mount in `/etc/fstab`**:
    Edit `/etc/fstab`:
    ```bash
-   sudo nano /etc/fstab
+   sudo vim /etc/fstab
    ```
    Add the following line:
    ```

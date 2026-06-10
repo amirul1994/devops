@@ -1,0 +1,101 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: vault
+  namespace: vault
+spec:
+  serviceName: vault
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vault
+  template:
+    metadata:
+      labels:
+        app: vault
+    spec:
+      initContainers:
+      - name: wait-for-certs
+        image: busybox:1.36
+        command: ['sh', '-c', 'until ls /vault/tls/server.crt; do echo "waiting for certs..."; sleep 2; done']
+        volumeMounts:
+        - name: tls
+          mountPath: /vault/tls
+      containers:
+      - name: vault
+        image: hashicorp/vault:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: HOSTNAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: VAULT_CACERT
+          value: /vault/tls/ca.crt
+        ports:
+        - containerPort: 8200
+          name: api
+        - containerPort: 8201
+          name: cluster
+        securityContext:
+          capabilities:
+            add: ["IPC_LOCK"]
+          runAsUser: 0
+        command:
+        - /bin/sh
+        - -c
+        - |
+          apk add --no-cache gettext
+          cp /vault/tls/ca.crt /usr/local/share/ca-certificates/
+          update-ca-certificates
+          envsubst '$HOSTNAME' < /vault/config/vault.hcl > /tmp/vault.hcl
+          exec vault server -config=/tmp/vault.hcl
+        volumeMounts:
+        - name: config
+          mountPath: /vault/config
+        - name: tls
+          mountPath: /vault/tls
+        - name: data
+          mountPath: /vault/data
+        readinessProbe:
+          httpGet:
+            scheme: HTTPS
+            path: /v1/sys/health?standbyok=true
+            port: 8200
+          initialDelaySeconds: 15
+          periodSeconds: 5
+        livenessProbe:
+          httpGet:
+            scheme: HTTPS
+            path: /v1/sys/health?standbyok=true
+            port: 8200
+          initialDelaySeconds: 30
+          periodSeconds: 10
+      volumes:
+      - name: config
+        configMap:
+          name: vault-config
+      - name: tls
+        projected:
+          sources:
+          - secret:
+              name: vault-tls
+              items:
+                - key: server.crt
+                  path: server.crt
+                - key: server.key
+                  path: server.key
+          - secret:
+              name: vault-ca
+              items:
+                - key: ca.crt
+                  path: ca.crt
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      storageClassName: local-path
+      resources:
+        requests:
+          storage: 1Gi

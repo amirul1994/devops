@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: vault-cert-generator
+  namespace: vault
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: vault-cert-generator-role
+  namespace: vault
+rules:
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["create", "get", "list", "patch", "update", "apply"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: vault-cert-generator-binding
+  namespace: vault
+subjects:
+- kind: ServiceAccount
+  name: vault-cert-generator
+  namespace: vault
+roleRef:
+  kind: Role
+  name: vault-cert-generator-role
+  apiGroup: rbac.authorization.k8s.io

@@ -1,0 +1,164 @@
+global:
+  namespace: vault
+  tlsDisable: false
+
+injector:
+  enabled: true
+  replicaCount: 2
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 65534
+    readOnlyRootFilesystem: true
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+
+server:
+  serviceAccount:
+    create: true
+    name: vault
+    annotations:
+      eks.amazonaws.com/role-arn: arn:aws:iam::533267333644:role/vault-auto-unseal-role-vault-production
+
+  ha:
+    enabled: true
+    replicas: 3
+    raft:
+      enabled: true
+      setNodeId: true
+      config: |
+        ui = true
+        
+        listener "tcp" {
+          address = "[::]:8200"
+          cluster_address = "[::]:8201"
+          tls_cert_file = "/vault/userconfig/vault-tls/vault-tls/tls.crt"
+          tls_key_file  = "/vault/userconfig/vault-tls/vault-tls/tls.key"
+          tls_disable = false
+        }
+        
+        seal "awskms" {
+          region     = "us-east-1"
+          kms_key_id = "d5379491-2c81-4796-857b-f9c39fe90d02"
+        }
+        
+        storage "raft" {
+          path = "/vault/data"
+          node_id = "NODE_ID"
+          retry_leader_election = true
+          retry_join {
+            leader_api_addr = "https://vault-0.vault-internal:8200"
+            leader_ca_cert_file = "/vault/userconfig/vault-ca/vault-ca/ca.crt"
+            leader_client_cert_file = "/vault/userconfig/vault-tls/vault-tls/tls.crt"
+            leader_client_key_file = "/vault/userconfig/vault-tls/vault-tls/tls.key"
+          }
+          retry_join {
+            leader_api_addr = "https://vault-1.vault-internal:8200"
+            leader_ca_cert_file = "/vault/userconfig/vault-ca/vault-ca/ca.crt"
+            leader_client_cert_file = "/vault/userconfig/vault-tls/vault-tls/tls.crt"
+            leader_client_key_file = "/vault/userconfig/vault-tls/vault-tls/tls.key"
+          }
+          retry_join {
+            leader_api_addr = "https://vault-2.vault-internal:8200"
+            leader_ca_cert_file = "/vault/userconfig/vault-ca/vault-ca/ca.crt"
+            leader_client_cert_file = "/vault/userconfig/vault-tls/vault-tls/tls.crt"
+            leader_client_key_file = "/vault/userconfig/vault-tls/vault-tls/tls.key"
+          }
+        }
+        
+        service_registration "kubernetes" {}
+        
+        disable_mlock = true
+        log_level = "info"
+
+  dataStorage:
+    enabled: true
+    size: 20Gi
+    storageClass: gp2
+    accessMode: ReadWriteOnce
+
+  auditStorage:
+    enabled: true
+    size: 10Gi
+    storageClass: gp2
+    accessMode: ReadWriteOnce
+
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 100
+    runAsGroup: 1000
+    fsGroup: 1000
+    readOnlyRootFilesystem: true
+    allowPrivilegeEscalation: false
+    seccompProfile:
+      type: RuntimeDefault
+
+  resources:
+    requests:
+      memory: "1Gi"
+      cpu: "500m"
+    limits:
+      memory: "2Gi"
+      cpu: "1000m"
+
+  affinity: |
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: vault
+              app.kubernetes.io/instance: vault
+              component: server
+          topologyKey: kubernetes.io/hostname
+
+  nodeAffinity: |
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        preference:
+          matchExpressions:
+            - key: topology.kubernetes.io/zone
+              operator: In
+              values:
+                - us-east-1a
+                - us-east-1b
+                - us-east-1c
+
+  extraVolumes:
+    - type: secret
+      name: vault-tls
+      path: "/vault/userconfig/vault-tls"
+    - type: secret
+      name: vault-ca
+      path: "/vault/userconfig/vault-ca"
+
+  extraEnvironmentVars:
+    VAULT_CACERT: "/vault/userconfig/vault-ca/vault-ca/ca.crt"
+    VAULT_ADDR: "https://127.0.0.1:8200"
+
+  podDisruptionBudget:
+    enabled: true
+    maxUnavailable: 1
+
+ui:
+  enabled: true
+  serviceType: ClusterIP
+
+networkPolicy:
+  enabled: true
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: vault
+        - namespaceSelector:
+            matchLabels:
+              name: kube-system
+      ports:
+        - protocol: TCP
+          port: 8200
+        - protocol: TCP
+          port: 8201

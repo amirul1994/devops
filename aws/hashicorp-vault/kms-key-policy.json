@@ -1,0 +1,17 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {"AWS": "arn:aws:iam::533267333644:root"},
+            "Action": "kms:*",
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Principal": {"AWS": "arn:aws:iam::533267333644:role/vault-auto-unseal-role-vault-production"},
+            "Action": ["kms:Decrypt", "kms:Encrypt", "kms:DescribeKey"],
+            "Resource": "*"
+        }
+    ]
+}
